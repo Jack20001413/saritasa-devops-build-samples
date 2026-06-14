@@ -35,6 +35,14 @@ curl -LO "https://github.com/tektoncd/pipelines-as-code/releases/download/v${TKN
 sudo dpkg -i "./tkn-pac-${TKN_PAC_VERSION}_linux-x86_64.deb"
 ```
 
+Install **Gosmee**. This is a webhook relay server to relay Github Webhook to your internal Tekton Pipelines
+
+```sh
+GOSMEE_VERSION=0.31.1
+curl -LO "https://github.com/chmouel/gosmee/releases/download/v${GOSMEE_VERSION}/gosmee-${GOSMEE_VERSION}_linux-x86_64.deb"
+sudo dpkg -i "./gosmee-${GOSMEE_VERSION}_linux-x86_64.deb"
+```
+
 ### Optional Dependencies
 
 #### Tekton Dashboard
@@ -112,6 +120,18 @@ spec:
                 number: 8080
 EOF
 ```
+
+### Setup Gosmee as Webhook Relay
+
+Now, you need to set up a webhook relay server because you are hosting your CI system in a local K8s cluster. Go to this endpoint [https://hook.pipelinesascode.com/](https://hook.pipelinesascode.com/) to create a public endpoint so your Github Webhook can send its events to. This endpoint will create a unique endpoint once you accessing it.
+
+Then, you configure `gosmee` client to relay events from [https://hook.pipelinesascode.com/](https://hook.pipelinesascode.com/) to your local CI system
+
+```sh
+gosmee client https://hook.pipelinesascode.com/<unique-id> http://hook.saritasa.test.com
+```
+
+***Note***: After setting relay server, you need to open new terminal to continue running the setup because `gosmee` keeps running in the foreground in the current terminal.
 
 ### Initialize a Github App
 
