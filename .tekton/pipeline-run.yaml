@@ -6,7 +6,7 @@ metadata:
     pipelinesascode.tekton.dev/on-event: "[pull_request, push, incoming]"
     pipelinesascode.tekton.dev/on-target-branch: "[main]"
     pipelinesascode.tekton.dev/max-keep-runs: "5"
-    pipelinesascode.tekton.dev/on-path-changed-ignore: "[.tekton/**, go.mod, go.sum, LICENSE, NOTICE, README.md, .editorconfig]"
+    pipelinesascode.tekton.dev/on-path-changed-ignore: "[go.mod, go.sum, LICENSE, NOTICE, README.md, .editorconfig]"
 spec:
   params:
     # The variable with brackets are special to Pipelines-as-Code
