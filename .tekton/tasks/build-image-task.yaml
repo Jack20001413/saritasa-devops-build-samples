@@ -7,7 +7,7 @@ spec:
   params:
   steps:
   - name: build-and-push
-    image: paketobuildpacks/builder:base 
+    image: buildpacksio/pack:base
     script: |
       #!/bin/bash
       set -ex
