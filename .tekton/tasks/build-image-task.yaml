@@ -8,11 +8,32 @@ spec:
   workspaces:
     - name: source
   steps:
+  # - name: build-and-push
+  #   image: buildpacksio/pack:base
+  #   script: |
+  #     #!/bin/bash
+  #     set -ex
+
+  #     ls -la $(workspaces.source.path)
+
+  #     # List all directories with changes and put them in an array
+  #     changed_dirs=()
+  #     while IFS= read -r line; do
+  #         changed_dirs+=("$line")
+  #     done < <(git diff --name-only | xargs -I {} dirname {} | sort -u)
+
   - name: build-and-push
-    image: buildpacksio/pack:base
+    image: ubuntu:jammy
     script: |
       #!/bin/bash
       set -ex
+
+      sudo add-apt-repository ppa:cncf-buildpacks/pack-cli
+      sudo apt-get update
+      sudo apt-get install pack-cli
+
+      echo "$(pack version)"
+      echo "$(git version)"
 
       ls -la $(workspaces.source.path)
 
