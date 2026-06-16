@@ -13,6 +13,7 @@ the `.php.ini.d` directory. It runs with the built-in PHP server.
 
 ## Viewing
 
+
 `curl http://localhost:8080`
 
 ## Stack Support
