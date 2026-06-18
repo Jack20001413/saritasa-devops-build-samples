@@ -24,7 +24,7 @@ spec:
         - name: revision
           value: $(params.revision)
       workspaces:
-        - name: source
+        - name: output
           workspace: source
         - name: basic-auth
           workspace: basic-auth
@@ -35,7 +35,7 @@ spec:
       runAfter:
         - fetch-repository
       workspaces:
-        - name: source
+        - name: output
           workspace: source
 
       # - name: trigger-build-push-changed-components
