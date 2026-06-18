@@ -60,7 +60,7 @@ spec:
         - name: git-auth-secret-name
           value: $(params.git-auth-secret-name)
         - name: changed-components
-          value: $(results.detect-changed-components.changed-dirs)
+          value: $(tasks.detect-changed-components.results.changed-dirs)
         - name: max-concurrent-builds
           value: "5"
       workspaces:
