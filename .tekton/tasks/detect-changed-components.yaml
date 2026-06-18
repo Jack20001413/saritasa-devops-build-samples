@@ -5,24 +5,24 @@ metadata:
   namespace: tekton-pipelines
 spec:
   workspaces:
-  - name: output
+    - name: source
   
   results:
-  - name: changed-dirs
-    description: All directories with file changes
+    - name: changed-dirs
+      description: All directories with file changes
 
   steps:
-  - name: detect-change
-    image: alpine/git:latest
-    workingDir: $(workspaces.output.path)
-    script: |
-      #!/bin/sh
-      set -e
+    - name: detect-change
+      image: alpine/git:latest
+      workingDir: $(workspaces.source.path)
+      script: |
+        #!/bin/sh
+        set -e
 
-      pwd
-      ls -la $(pwd)
+        pwd
+        ls -la $(pwd)
 
-      # List all directories with changes in POSIX sh style.
-      changed_dirs=$(git diff --name-only | xargs -I {} dirname {} | sort -u | tr '\n' ' ')
+        # List all directories with changes in POSIX sh style.
+        changed_dirs=$(git diff --name-only | xargs -I {} dirname {} | sort -u | tr '\n' ' ')
 
-      printf '%s' "$changed_dirs" | tee "$(results.changed-dirs.path)"
+        printf '%s' "$changed_dirs" | tee "$(results.changed-dirs.path)"
