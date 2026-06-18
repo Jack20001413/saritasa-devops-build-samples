@@ -16,7 +16,7 @@ spec:
     image: alpine/git:latest
     workingDir: $(workspaces.source.path)
     script: |
-      #!/bin/bash
+      #!/bin/sh
       set -e
 
       # List all directories with changes and write them one per line.
