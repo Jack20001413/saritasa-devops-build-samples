@@ -17,7 +17,7 @@ spec:
     - name: revision
       value: "{{ revision }}"
   pipelineRef:
-    name: saritasa-test-app-pipeline
+    name: main-pipeline
 
   workspaces:
     - name: source

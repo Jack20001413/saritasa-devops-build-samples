@@ -1,0 +1,28 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: detect-changed-components
+  namespace: tekton-pipelines
+spec:
+  workspaces:
+  - name: source
+  
+  results:
+  - name: changed-dirs
+    description: All directories with file changes
+
+  steps:
+  - name: detect-change
+    image: alpine/git:latest
+    workingDir: $(workspaces.source.path)
+    script: |
+      #!/bin/bash
+      set -e
+
+      # List all directories with changes and write them one per line.
+      changed_dirs=()
+      while IFS= read -r line; do
+          changed_dirs+=("$line")
+      done < <(git diff --name-only | xargs -I {} dirname {} | sort -u)
+
+      echo -n "${changed_dirs[@]}" | tee "$(results.changed-dirs.path)"

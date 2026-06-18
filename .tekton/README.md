@@ -153,3 +153,11 @@ tkn pac create repository
 ? Enter the Git repository URL :  <Current repo URL>
 ? Please enter the namespace where the pipeline should run (default: default): <Namespace for containing pipeline runs>
 ```
+
+### Create a Kubernetes secret for access Docker Registry
+
+Use this command to create a secret for holding credentials to access a Docker Registry
+
+```sh
+kubectl create secret docker-cred regcred --docker-username=<your-name> --docker-password=<your-pword> --docker-email=<your-email>
+```

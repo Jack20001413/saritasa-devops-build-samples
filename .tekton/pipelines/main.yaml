@@ -1,14 +1,19 @@
 apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
-  name: saritasa-test-app-pipeline
+  name: main-pipeline
+  namespace: tekton-pipelines
 spec:
   params:
     - name: repo_url
+      description: The repo URL where Git will clone
     - name: revision
+      description: Repo's commit SHA
+
   workspaces:
     - name: source
     - name: basic-auth
+    
   tasks:
     - name: fetch-repository
       taskRef:
@@ -24,12 +29,21 @@ spec:
         - name: basic-auth
           workspace: basic-auth
 
-    - name: build-and-push
+    - name: detect-changed-components
       taskRef:
-        name: build-push-image
+        name: detect-changed-components
       runAfter:
         - fetch-repository
       workspaces:
         - name: source
           workspace: source
+
+      # - name: trigger-build-push-changed-components
+      #   taskRef:
+      #     name: trigger-build
+      #   runAfter:
+      #     - detect-changed-components
+      #   workspaces:
+      #     - name: source
+      #       workspace: source
       

@@ -1,0 +1,35 @@
+
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: pack-build-image
+  namespace: tekton-pipelines
+  annotations:
+    description: A task to build source code using Buildpacks pack CLI
+spec:
+  params:
+    - name: image-url
+      description: URL of the image to be built and pushed
+    - name: image-tag
+      description: Tag of the image to be built by Paketo
+    - name: component-dir
+      description: Path of the buildpacks-ready component directory
+
+  workspaces:
+    - name: source
+
+  results:
+    - name: image-full-url
+      description: Full URL of the built image
+
+  steps:
+    - name: build-and-push
+      image: buildpacksio/pack:base
+      workingDir: $(workspaces.source.path)/$(params.component-dir)
+      script: |
+        #!/bin/bash
+        set -e
+
+        pack build $(params.image-url) --tag $(params.image-tag) --builder paketobuildpacks/builder-jammy-full
+        
+        echo -n "$(params.image-url):$(params.image-tag)" > $(results.image-full-url.path)
