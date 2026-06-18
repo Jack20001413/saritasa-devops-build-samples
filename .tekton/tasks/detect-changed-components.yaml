@@ -14,38 +14,12 @@ spec:
   steps:
     - name: detect-change
       image: alpine/git:latest
-      workingDir: $(workspaces.source.path)/repo
+      workingDir: $(workspaces.source.path)
       script: |
         #!/bin/sh
         set -eu
 
-        git config --global --add safe.directory /workspace/source/repo
-
-        # Inspect file-level changes from the checked-out commit without
-        # hardcoding any commit range. `--root` also supports first-commit runs.
-        # changed_files="$({
-        #   git diff-tree --root --no-commit-id --name-status -r HEAD \
-        #     | awk '
-        #         $1 ~ /^R[0-9]+$/ { print $3; next }
-        #         $1 ~ /^(A|C|D|M|T|U|X|B)$/ { print $2 }
-        #       '
-        # })"
-
-        # if [ -z "$changed_files" ]; then
-        #   : > "$(results.changed-dirs.path)"
-        #   exit 0
-        # fi
-
-        # # List all unique directories that contain changed files.
-        # changed_dirs="$({
-        #   printf '%s\n' "$changed_files" \
-        #     | while IFS= read -r file; do
-        #         [ -n "$file" ] && dirname "$file"
-        #       done \
-        #     | sort -u \
-        #     | tr '\n' ' ' \
-        #     | sed 's/[[:space:]]*$//'
-        # })"
+        git config --global --add safe.directory /workspace/source
 
         changed_dirs="$(git diff HEAD~1 HEAD --name-only | xargs -I {} dirname "{}" | sort -u)"
 
