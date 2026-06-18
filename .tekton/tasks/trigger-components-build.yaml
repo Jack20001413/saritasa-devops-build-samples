@@ -16,7 +16,7 @@ spec:
       type: string
     - name: changed-components
       description: JSON array of changed component directories
-      type: array
+      type: string
     - name: max-concurrent-builds
       description: Maximum number of concurrent builds
       type: string
@@ -40,136 +40,136 @@ spec:
     - name: trigger-build
       image: alpine/k8s:latest
       script: |
-      #!/bin/bash
-      set -e
+        #!/bin/bash
+        set -e
 
-      COMPONENTS="$(params.changed-components)"
-      MAX_CONCURRENT="$(params.max-concurrent-builds)"
-      REVISION="$(params.revision)"
-      NAMESPACE="$(params.pipeline-namespace)"
-      REPO_URL="$(params.repo-url)"
-      IMAGE_REGISTRY="$(params.image-registry)"
+        COMPONENTS="$(params.changed-components)"
+        MAX_CONCURRENT="$(params.max-concurrent-builds)"
+        REVISION="$(params.revision)"
+        NAMESPACE="$(params.pipeline-namespace)"
+        REPO_URL="$(params.repo-url)"
+        IMAGE_REGISTRY="$(params.image-registry)"
 
-      COMMIT_SHA_SHORT="${REVISION:0:7}"
+        COMMIT_SHA_SHORT="${REVISION:0:7}"
 
-      # Check if no changed components detected, then returns early
-      if [ "$COMPONENTS" = "[]" ]; then
-          echo "No changed components detected. Skipping build."
-          echo -n "0" > $(results.pipeline-runs.path)
-          echo -n "" > $(results.pipeline-names.path)
-          exit 0
-      fi
-
-      # Parse components from JSON array and create PipelineRuns
-      CREATED_RUNS=""
-      RUN_COUNT=0
-
-      # Use jq to extract array elements if available, fallback to manual parsing
-      if command -v jq >/dev/null 2>&1; then
-        COMPONENT_LIST=$(echo "$COMPONENTS" | jq -r '.[]')
-      else
-        # Manual JSON parsing for minimal environments
-        COMPONENT_LIST=$(echo "$COMPONENTS" | tr -d '[]"' | tr ',' '\n')
-      fi
-
-      echo "---Triggering builds for changed components---"
-
-      for component in "${COMPONENT_LIST[@]}"; do
-        component=$(echo "$component" | xargs)
-
-        if [ -z "$component" ]; then
-          continue
+        # Check if no changed components detected, then returns early
+        if [ "$COMPONENTS" = "[]" ]; then
+            echo "No changed components detected. Skipping build."
+            echo -n "0" > $(results.pipeline-runs.path)
+            echo -n "" > $(results.pipeline-names.path)
+            exit 0
         fi
 
-        component_name="${component//\//-}"
+        # Parse components from JSON array and create PipelineRuns
+        CREATED_RUNS=""
+        RUN_COUNT=0
 
-        PIPELINE_RUN_NAME="${component_name}-$COMMIT_SHA_SHORT-run"
-
-        echo "Creating build for component: $component"
-        echo "PipelineRun name: $PIPELINE_RUN_NAME"
-        echo "Namespace: $NAMESPACE"
-
-        cat <<EOF | kubectl apply -f -
-          apiVersion: tekton.dev/v1
-          kind: PipelineRun
-          metadata:
-            name: $PIPELINE_RUN_NAME
-            namespace: $NAMESPACE
-            labels:
-              tekton.dev/pipeline: build-deploy-component
-            annotations:
-            #   pipelinesascode.tekton.dev/on-event: "[incoming]"
-            #   pipelinesascode.tekton.dev/on-target-branch: "[main]"
-              pipelinesascode.tekton.dev/task: "[git-clone]"
-              pipelinesascode.tekton.dev/max-keep-runs: "5"
-          spec:
-            timeout: 1h
-
-            # serviceAccountName: build-pipeline-sa
-
-            params:
-              - name: repo-url
-                value: $REPO_URL
-              - name: revision
-                value: $REVISION
-              - name: project-dir
-                value: $component
-              - name: image-url
-                value: $IMAGE_REGISTRY/$component_name
-              - name: image-tag
-                value: $COMMIT_SHA_SHORT
-
-            pipelineRef:
-              name: trigger-build-component
-
-            workspaces:
-              - name: source
-                volumeClaimTemplate:
-                  spec:
-                    accessModes:
-                      - ReadWriteOnce
-                    resources:
-                      requests:
-                        storage: 1Gi
-
-              - name: basic-auth
-                secret:
-                  secretName: "$(params.git-auth-secret-name)"
-
-              # Docker config
-            #   - name: docker-config
-            #     secret:
-            #       secretName: docker-config
-        EOF
-
-        if [ $? -eq 0 ]; then
-          echo "PipelineRun created successfully"
-          CREATED_RUNS="${CREATED_RUNS}${CREATED_RUNS:+,}${PIPELINE_RUN_NAME}"
-          RUN_COUNT=$((RUN_COUNT+1))
+        # Use jq to extract array elements if available, fallback to manual parsing
+        if command -v jq >/dev/null 2>&1; then
+            COMPONENT_LIST=$(echo "$COMPONENTS" | jq -r '.[]')
         else
-          echo "Failed to create PipelineRun"
+            # Manual JSON parsing for minimal environments
+            COMPONENT_LIST=$(echo "$COMPONENTS" | tr -d '[]"' | tr ',' '\n')
         fi
-                  
-        # Scarcity control
-        RUNNING_BUILDS=$(kubectl get pipelineruns -n $NAMESPACE \
-          -l tekton.dev/pipeline=build-deploy-component \
-          --field-selector=status.conditions[0].status=True 2>/dev/null \
-          | tail -n +2 | wc -l)
 
-        while [ $RUNNING_BUILDS -ge $MAX_CONCURRENT ]; do
-          echo "Waiting for available slots: running $RUNNING_BUILDS, max $MAX_CONCURRENT"
-          sleep 10
-          RUNNING_BUILDS=$(kubectl get pipelineruns -n $NAMESPACE \
+        echo "---Triggering builds for changed components---"
+
+        for component in "${COMPONENT_LIST[@]}"; do
+            component=$(echo "$component" | xargs)
+
+            if [ -z "$component" ]; then
+            continue
+            fi
+
+            component_name="${component//\//-}"
+
+            PIPELINE_RUN_NAME="${component_name}-$COMMIT_SHA_SHORT-run"
+
+            echo "Creating build for component: $component"
+            echo "PipelineRun name: $PIPELINE_RUN_NAME"
+            echo "Namespace: $NAMESPACE"
+
+            cat <<EOF | kubectl apply -f -
+            apiVersion: tekton.dev/v1
+            kind: PipelineRun
+            metadata:
+                name: $PIPELINE_RUN_NAME
+                namespace: $NAMESPACE
+                labels:
+                tekton.dev/pipeline: build-deploy-component
+                annotations:
+                #   pipelinesascode.tekton.dev/on-event: "[incoming]"
+                #   pipelinesascode.tekton.dev/on-target-branch: "[main]"
+                pipelinesascode.tekton.dev/task: "[git-clone]"
+                pipelinesascode.tekton.dev/max-keep-runs: "5"
+            spec:
+                timeout: 1h
+
+                # serviceAccountName: build-pipeline-sa
+
+                params:
+                - name: repo-url
+                    value: $REPO_URL
+                - name: revision
+                    value: $REVISION
+                - name: project-dir
+                    value: $component
+                - name: image-url
+                    value: $IMAGE_REGISTRY/$component_name
+                - name: image-tag
+                    value: $COMMIT_SHA_SHORT
+
+                pipelineRef:
+                name: trigger-build-component
+
+                workspaces:
+                - name: source
+                    volumeClaimTemplate:
+                    spec:
+                        accessModes:
+                        - ReadWriteOnce
+                        resources:
+                        requests:
+                            storage: 1Gi
+
+                - name: basic-auth
+                    secret:
+                    secretName: "$(params.git-auth-secret-name)"
+
+                # Docker config
+                #   - name: docker-config
+                #     secret:
+                #       secretName: docker-config
+            EOF
+
+            if [ $? -eq 0 ]; then
+            echo "PipelineRun created successfully"
+            CREATED_RUNS="${CREATED_RUNS}${CREATED_RUNS:+,}${PIPELINE_RUN_NAME}"
+            RUN_COUNT=$((RUN_COUNT+1))
+            else
+            echo "Failed to create PipelineRun"
+            fi
+                    
+            # Scarcity control
+            RUNNING_BUILDS=$(kubectl get pipelineruns -n $NAMESPACE \
             -l tekton.dev/pipeline=build-deploy-component \
             --field-selector=status.conditions[0].status=True 2>/dev/null \
             | tail -n +2 | wc -l)
+
+            while [ $RUNNING_BUILDS -ge $MAX_CONCURRENT ]; do
+            echo "Waiting for available slots: running $RUNNING_BUILDS, max $MAX_CONCURRENT"
+            sleep 10
+            RUNNING_BUILDS=$(kubectl get pipelineruns -n $NAMESPACE \
+                -l tekton.dev/pipeline=build-deploy-component \
+                --field-selector=status.conditions[0].status=True 2>/dev/null \
+                | tail -n +2 | wc -l)
+            done
         done
-      done
 
-      echo ""
-      echo "---Trigger summary---"
-      echo "Created PipelineRuns: $CREATED_RUNS"
-      echo "Total PipelineRuns created: $RUN_COUNT"
+        echo ""
+        echo "---Trigger summary---"
+        echo "Created PipelineRuns: $CREATED_RUNS"
+        echo "Total PipelineRuns created: $RUN_COUNT"
 
-      echo -n "$RUN_COUNT" > $(results.build-count.path)
-      echo -n "$CREATED_RUNS" > $(results.pipelines-name.path)
+        echo -n "$RUN_COUNT" > $(results.build-count.path)
+        echo -n "$CREATED_RUNS" > $(results.pipelines-name.path)
