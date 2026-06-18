@@ -14,7 +14,7 @@ spec:
   steps:
   - name: detect-change
     image: alpine/git:latest
-    workingDir: $(workspaces.source.path)
+    workingDir: $(workspaces.output.path)
     script: |
       #!/bin/sh
       set -e
