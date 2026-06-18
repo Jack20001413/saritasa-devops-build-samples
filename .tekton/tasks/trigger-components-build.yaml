@@ -55,7 +55,7 @@ spec:
         # Check if no changed components detected, then returns early
         if [ "$COMPONENTS" = "[]" ]; then
             echo "No changed components detected. Skipping build."
-            echo -n "0" > $(results.pipeline-runs.path)
+            echo -n "0" > $(results.build-count.path)
             echo -n "" > $(results.pipeline-names.path)
             exit 0
         fi
