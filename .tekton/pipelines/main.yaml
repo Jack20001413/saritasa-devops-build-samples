@@ -9,6 +9,8 @@ spec:
       description: The repo URL where Git will clone
     - name: revision
       description: Repo's commit SHA
+    - name: git-auth-secret-name
+      description: Name of Kubernetes secret holding Git credentials
 
   workspaces:
     - name: source
@@ -18,7 +20,6 @@ spec:
     - name: fetch-repository
       taskRef:
         name: git-clone
-        # name: git-clone-with-basic-auth
       params:
         - name: url
           value: $(params.repo_url)
@@ -43,12 +44,23 @@ spec:
         - name: source
           workspace: source
 
-      # - name: trigger-build-push-changed-components
-      #   taskRef:
-      #     name: trigger-build
-      #   runAfter:
-      #     - detect-changed-components
-      #   workspaces:
-      #     - name: source
-      #       workspace: source
+      - name: build-push-deploy-changed-components
+        taskRef:
+          name: trigger-components-build
+        runAfter:
+          - detect-changed-components
+        params:
+          - name: repo-url
+            value: $(params.repo_url)
+          - name: revision
+            value: $(params.revision)
+          - name: git-auth-secret-name
+            value: $(params.git-auth-secret-name)
+          - name: changed-components
+            value: $(results.detect-changed-components.changed-dirs)
+          - name: max-concurrent-builds
+            value: "5"
+        workspaces:
+          - name: source
+            workspace: source
       

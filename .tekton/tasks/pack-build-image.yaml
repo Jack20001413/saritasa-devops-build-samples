@@ -1,4 +1,3 @@
-
 # apiVersion: tekton.dev/v1
 # kind: Task
 # metadata:
@@ -13,7 +12,7 @@
 #     - name: image-tag
 #       description: Tag of the image to be built by Paketo
 #     - name: component-dir
-#       description: Path of the buildpacks-ready component directory
+#       description: Path of the component directory with changes
 
 #   workspaces:
 #     - name: source
@@ -23,7 +22,7 @@
 #       description: Full URL of the built image
 
 #   steps:
-#     - name: build-and-push
+#     - name: build-image
 #       image: buildpacksio/pack:base
 #       workingDir: $(workspaces.source.path)/$(params.component-dir)
 #       script: |

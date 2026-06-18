@@ -16,6 +16,9 @@ spec:
       value: "{{ repo_url }}"
     - name: revision
       value: "{{ revision }}"
+    - name: git-auth-secret-name
+      value: "{{ git_auth_secret }}"
+      
   pipelineRef:
     name: main-pipeline
 

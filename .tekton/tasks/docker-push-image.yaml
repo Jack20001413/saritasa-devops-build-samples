@@ -2,7 +2,7 @@
 # apiVersion: tekton.dev/v1
 # kind: Task
 # metadata:
-#   name: push-image
+#   name: docker-push-image
 #   namespace: tekton-pipelines
 #   annotations:
 #     description: A task to push a OCI image to a registry
