@@ -23,7 +23,7 @@ spec:
       default: "3"
     - name: pipeline-namespace
       description: Kubernetes namespace for containing PipelineRuns
-      type: string
+      type: array
       default: "tekton-pipelines"
     - name: image-registry
       description: Docker image registry URL
