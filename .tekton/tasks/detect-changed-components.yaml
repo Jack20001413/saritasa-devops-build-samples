@@ -25,6 +25,10 @@ spec:
         echo ""
         ls -la "$(pwd)/.git"
 
+        git log
+
+        git reflog
+
         # Inspect file-level changes from the checked-out commit without
         # hardcoding any commit range. `--root` also supports first-commit runs.
         # changed_files="$({

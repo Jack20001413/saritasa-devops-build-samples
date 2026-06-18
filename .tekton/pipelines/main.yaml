@@ -18,6 +18,7 @@ spec:
     - name: fetch-repository
       taskRef:
         name: git-clone
+        # name: git-clone-with-basic-auth
       params:
         - name: url
           value: $(params.repo_url)
@@ -43,6 +44,8 @@ spec:
       workspaces:
         - name: source
           workspace: source
+        - name: basic-auth
+          workspace: basic-auth
 
       # - name: trigger-build-push-changed-components
       #   taskRef:
