@@ -1,96 +1,96 @@
-apiVersion: tekton.dev/v1
-kind: Pipeline
-metadata:
-  name: trigger-build-deploy-changed-component
-  namespace: tekton-pipelines
-spec:
-  params:
-    - name: repo_url
-      type: string
-      description: The URL of the Git repository to fetch
-    - name: revision
-      type: string
-      description: The Git revision (branch, tag, commit SHA) to fetch
-    - name: image-url
-      type: string
-      description: URL of the image to be built and pushed
-    - name: image-tag
-      type: string
-      description: Tag of the image built from paketo
-    - name: project-dir
-      type: string
-      description: Full path of the project's directory to be built
+# apiVersion: tekton.dev/v1
+# kind: Pipeline
+# metadata:
+#   name: trigger-build-deploy-changed-component
+#   namespace: tekton-pipelines
+# spec:
+#   params:
+#     - name: repo_url
+#       type: string
+#       description: The URL of the Git repository to fetch
+#     - name: revision
+#       type: string
+#       description: The Git revision (branch, tag, commit SHA) to fetch
+#     - name: image-url
+#       type: string
+#       description: URL of the image to be built and pushed
+#     - name: image-tag
+#       type: string
+#       description: Tag of the image built from paketo
+#     - name: project-dir
+#       type: string
+#       description: Full path of the project's directory to be built
 
-  workspaces:
-    - name: source
-      description: Workspace for the repository
-    - name: basic-auth
-      description: Git credentials
-      optional: true
-    - name: docker-credentials
-      description: Docker credentials for pushing image
-      optional: true
+#   workspaces:
+#     - name: source
+#       description: Workspace for the repository
+#     - name: basic-auth
+#       description: Git credentials
+#       optional: true
+#     - name: docker-credentials
+#       description: Docker credentials for pushing image
+#       optional: true
 
-  results:
-    - name: image-url
-      description: URL of the image built
-      value: $(tasks.pack-build-component.results.image-full-url)
+#   results:
+#     - name: image-url
+#       description: URL of the image built
+#       value: $(tasks.pack-build-component.results.image-full-url)
 
-  tasks:
-    - name: clone-repository
-      taskRef:
-        name: git-clone
-      params:
-        - name: url
-          value: $(params.repo_url)
-        - name: revision
-          value: $(params.revision)
-      workspaces:
-        - name: output
-          workspace: source
-        - name: basic-auth
-          workspace: basic-auth
+#   tasks:
+#     - name: clone-repository
+#       taskRef:
+#         name: git-clone
+#       params:
+#         - name: url
+#           value: $(params.repo_url)
+#         - name: revision
+#           value: $(params.revision)
+#       workspaces:
+#         - name: output
+#           workspace: source
+#         - name: basic-auth
+#           workspace: basic-auth
     
-    - name: build-component
-      taskRef:
-        name: pack-build-image
-      runAfter:
-        - clone-repository
-      params:
-        - name: image-url
-          value: $(params.image-url)
-        - name: image-tag
-          value: $(params.image-tag)
-        - name: component-dir
-          value: $(params.project-dir)
-      workspaces:
-        - name: source
-          workspace: source
+#     - name: build-component
+#       taskRef:
+#         name: pack-build-image
+#       runAfter:
+#         - clone-repository
+#       params:
+#         - name: image-url
+#           value: $(params.image-url)
+#         - name: image-tag
+#           value: $(params.image-tag)
+#         - name: component-dir
+#           value: $(params.project-dir)
+#       workspaces:
+#         - name: source
+#           workspace: source
 
-    - name: push-to-registry
-      taskRef:
-        name: push-image
-      runAfter:
-        - build-component
-      params:
-        - name: image-url
-          value: $(tasks.pack-build-component.results.image-full-url)
-      workspaces:
-        - name: docker-credentials
-          workspace: docker-credentials
+#     - name: push-to-registry
+#       taskRef:
+#         name: push-image
+#       runAfter:
+#         - build-component
+#       params:
+#         - name: image-url
+#           value: $(tasks.pack-build-component.results.image-full-url)
+#       workspaces:
+#         - name: docker-credentials
+#           workspace: docker-credentials
 
-    - name: deploy-application
-      taskRef:
-        name: deploy-to-kubernetes
-      runAfter:
-        - push-to-registry
-      params:
-        - name: image-url
-          value: $(tasks.push-to-registry.results.image-full-url)
-        - name: deployment-name
-          value: $(params.deployment-name)
-        - name: replicas
-          value: $(params.replicaCount)
-        - name: namespace
-          value: $(params.deployment-namespace)
+#     - name: deploy-application
+#       taskRef:
+#         name: deploy-to-kubernetes
+#       runAfter:
+#         - push-to-registry
+#       params:
+#         - name: image-url
+#           value: $(tasks.push-to-registry.results.image-full-url)
+#         - name: deployment-name
+#           value: $(params.deployment-name)
+#         - name: replicas
+#           value: $(params.replicaCount)
+#         - name: namespace
+#           value: $(params.deployment-namespace)
       
