@@ -19,18 +19,7 @@ spec:
         #!/bin/sh
         set -eu
 
-        pwd
-        ls -la "$(pwd)"
-        
-        echo ""
-        ls -la "$(pwd)/.git"
-
-        
         git config --global --add safe.directory /workspace/source/repo
-        
-        git log
-
-        git reflog
 
         # Inspect file-level changes from the checked-out commit without
         # hardcoding any commit range. `--root` also supports first-commit runs.
@@ -58,6 +47,6 @@ spec:
         #     | sed 's/[[:space:]]*$//'
         # })"
 
-        git diff HEAD~1 HEAD --name-only | xargs -I {} dirname "{}" | sort -u
+        changed_dirs="$(git diff HEAD~1 HEAD --name-only | xargs -I {} dirname "{}" | sort -u)"
 
         printf '%s' "$changed_dirs" | tee "$(results.changed-dirs.path)"
