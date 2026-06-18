@@ -25,6 +25,9 @@ spec:
         echo ""
         ls -la "$(pwd)/.git"
 
+        
+        git config --global --add safe.directory /workspace/source/repo
+        
         git log
 
         git reflog
