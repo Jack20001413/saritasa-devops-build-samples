@@ -21,6 +21,9 @@ spec:
 
         pwd
         ls -la $(pwd)
+        
+        echo ""
+        ls -la $(pwd)/.git
 
         # List all directories with changes in POSIX sh style.
         changed_dirs=$(git diff --name-only | xargs -I {} dirname {} | sort -u | tr '\n' ' ')

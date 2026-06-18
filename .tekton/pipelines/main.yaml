@@ -25,6 +25,8 @@ spec:
           value: $(params.revision)
         - name: depth
           value: "0"
+        - name: deleteExisting
+          value: "true"
       workspaces:
         - name: output
           workspace: source
