@@ -38,7 +38,7 @@ spec:
 
   steps:
     - name: trigger-build
-      image: alpine/k8s:latest
+      image: alpine/k8s:1.33.13
       script: |
         #!/bin/bash
         set -e
