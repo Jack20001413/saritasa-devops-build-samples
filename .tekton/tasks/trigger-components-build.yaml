@@ -86,7 +86,7 @@ spec:
             echo "PipelineRun name: $PIPELINE_RUN_NAME"
             echo "Namespace: $NAMESPACE"
 
-            cat << EOF | kubectl apply -f -
+            cat << -EOF | kubectl apply -f -
             apiVersion: tekton.dev/v1
             kind: PipelineRun
             metadata:
@@ -117,21 +117,21 @@ spec:
                     value: $COMMIT_SHA_SHORT
 
                 pipelineRef:
-                name: trigger-build-component
+                  name: trigger-build-component
 
                 workspaces:
                 - name: source
-                    volumeClaimTemplate:
+                  volumeClaimTemplate:
                     spec:
                         accessModes:
                         - ReadWriteOnce
                         resources:
-                        requests:
+                          requests:
                             storage: 1Gi
 
                 - name: basic-auth
                     secret:
-                    secretName: "$(params.git-auth-secret-name)"
+                      secretName: "$(params.git-auth-secret-name)"
 
                 # Docker config
                 #   - name: docker-config
