@@ -54,6 +54,8 @@ spec:
         COMPONENTS="${COMPONENTS#'}"
         COMPONENTS="${COMPONENTS%'}"
 
+        echo "$COMPONENTS"
+
         # Check if no changed components detected, then returns early
         if [ "$COMPONENTS" = "[]" ]; then
             echo "No changed components detected. Skipping build."
