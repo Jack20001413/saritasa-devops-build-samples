@@ -1,0 +1,47 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+    name: {{ pipeline_run_name }}
+    namespace: {{ namespace }}
+    labels:
+        tekton.dev/pipeline: build-deploy-component
+        pipelinesascode.tekton.dev/task: "[git-clone]"
+        pipelinesascode.tekton.dev/max-keep-runs: "5"
+spec:
+    timeout: 1h
+
+    # serviceAccountName: build-pipeline-sa
+
+    params:
+        - name: repo-url
+          value: {{ repo_url }}
+        - name: revision
+          value: {{ revision }}
+        - name: project-dir
+          value: {{ project_dir }}
+        - name: image-url
+          value: {{ image_url }}
+        - name: image-tag
+          value: {{ image_tag }}
+
+    pipelineRef:
+        name: trigger-build-component
+
+    workspaces:
+        - name: source
+          volumeClaimTemplate:
+            spec:
+                accessModes:
+                - ReadWriteOnce
+                resources:
+                    requests:
+                        storage: 1Gi
+
+        - name: basic-auth
+          secret:
+             secretName: {{ git_auth_secret_name }}
+
+        # Docker config
+        #   - name: docker-config
+        #     secret:
+        #       secretName: docker-config

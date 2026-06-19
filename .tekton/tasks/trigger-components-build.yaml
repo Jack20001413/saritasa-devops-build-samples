@@ -30,6 +30,9 @@ spec:
       type: string
       default: "docker.io"
 
+  workspaces:
+    - name: source
+
   results:
     - name: build-count
       description: Number of PipelineRuns triggered
@@ -39,6 +42,7 @@ spec:
   steps:
     - name: trigger-build
       image: alpine/k8s:1.33.13
+      workingDir: $(workspaces.source.path)
       script: |
         #!/bin/bash
         set -e
@@ -86,58 +90,17 @@ spec:
             echo "PipelineRun name: $PIPELINE_RUN_NAME"
             echo "Namespace: $NAMESPACE"
 
-            cat << EOF | kubectl apply -f -
-          apiVersion: tekton.dev/v1
-          kind: PipelineRun
-          metadata:
-              name: $PIPELINE_RUN_NAME
-              namespace: $NAMESPACE
-              labels:
-              tekton.dev/pipeline: build-deploy-component
-              annotations:
-              #   pipelinesascode.tekton.dev/on-event: "[incoming]"
-              #   pipelinesascode.tekton.dev/on-target-branch: "[main]"
-              pipelinesascode.tekton.dev/task: "[git-clone]"
-              pipelinesascode.tekton.dev/max-keep-runs: "5"
-          spec:
-              timeout: 1h
-
-              # serviceAccountName: build-pipeline-sa
-
-              params:
-              - name: repo-url
-                  value: $REPO_URL
-              - name: revision
-                  value: $REVISION
-              - name: project-dir
-                  value: $component
-              - name: image-url
-                  value: $IMAGE_REGISTRY/$component_name
-              - name: image-tag
-                  value: $COMMIT_SHA_SHORT
-
-              pipelineRef:
-                name: trigger-build-component
-
-              workspaces:
-              - name: source
-                volumeClaimTemplate:
-                  spec:
-                      accessModes:
-                      - ReadWriteOnce
-                      resources:
-                        requests:
-                          storage: 1Gi
-
-              - name: basic-auth
-                  secret:
-                    secretName: "$(params.git-auth-secret-name)"
-
-              # Docker config
-              #   - name: docker-config
-              #     secret:
-              #       secretName: docker-config
-          EOF
+            # Replace values into the PipelineRun template
+            yq '.metadata.name = "$PIPELINE_RUN_NAME" 
+              | .metadata.namespace = "$NAMESPACE" 
+              | .spec.params[] |= (select(.name == "repo-url") .value = "$REPO_URL") 
+              | .spec.params[] |= (select(.name == "revision") .value = "$REVISION") 
+              | .spec.params[] |= (select(.name == "project-dir") .value = "$component_name") 
+              | .spec.params[] |= (select(.name == "image-url") .value = "$IMAGE_REGISTRY/$component_name") 
+              | .spec.params[] |= (select(.name == "image-tag") .value = "$COMMIT_SHA_SHORT") 
+              | .spec.workspaces[] |= (select(.name == "basic-auth") .secret.secretName = "$(params.git-auth-secret-name)")' \
+            .tekton/template/trigger-component-build-run.yaml \
+            | kubectl apply -f -
 
             if [ $? -eq 0 ]; then
               echo "PipelineRun created successfully"
