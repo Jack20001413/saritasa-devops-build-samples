@@ -86,7 +86,7 @@ spec:
             echo "PipelineRun name: $PIPELINE_RUN_NAME"
             echo "Namespace: $NAMESPACE"
 
-            cat <<EOF | kubectl apply -f -
+            cat << EOF | kubectl apply -f -
             apiVersion: tekton.dev/v1
             kind: PipelineRun
             metadata:
