@@ -1,8 +1,8 @@
 apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:
-    name: {{ pipeline_run_name }}
-    namespace: {{ namespace }}
+    name: "{{ pipeline_run_name }}"
+    namespace: "{{ namespace }}"
     labels:
         tekton.dev/pipeline: build-deploy-component
         pipelinesascode.tekton.dev/task: "[git-clone]"
@@ -14,18 +14,18 @@ spec:
 
     params:
         - name: repo-url
-          value: {{ repo_url }}
+          value: "{{ repo_url }}"
         - name: revision
-          value: {{ revision }}
+          value: "{{ revision }}"
         - name: project-dir
-          value: {{ project_dir }}
+          value: "{{ project_dir }}"
         - name: image-url
-          value: {{ image_url }}
+          value: "{{ image_url }}"
         - name: image-tag
-          value: {{ image_tag }}
+          value: "{{ image_tag }}"
 
     pipelineRef:
-        name: trigger-build-component
+      name: trigger-build-component
 
     workspaces:
         - name: source
@@ -39,7 +39,7 @@ spec:
 
         - name: basic-auth
           secret:
-             secretName: {{ git_auth_secret_name }}
+             secretName: "{{ git_auth_secret_name }}"
 
         # Docker config
         #   - name: docker-config
