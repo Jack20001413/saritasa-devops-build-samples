@@ -10,6 +10,8 @@ spec:
   results:
     - name: changed-dirs
       description: All directories with file changes
+      type: string
+      default: []
 
   steps:
     - name: detect-change

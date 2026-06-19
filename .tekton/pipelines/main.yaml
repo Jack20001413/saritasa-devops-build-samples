@@ -62,7 +62,7 @@ spec:
         - name: changed-components
           value: "$(tasks.detect-changed-components.results.changed-dirs)"
         - name: max-concurrent-builds
-          value: "5"
+          value: 5
       workspaces:
         - name: source
           workspace: source

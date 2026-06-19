@@ -51,6 +51,8 @@ spec:
         IMAGE_REGISTRY="$(params.image-registry)"
 
         COMMIT_SHA_SHORT="${REVISION:0:7}"
+        COMPONENTS="${COMPONENTS#'}"
+        COMPONENTS="${COMPONENTS%'}"
 
         # Check if no changed components detected, then returns early
         if [ "$COMPONENTS" = "[]" ]; then
