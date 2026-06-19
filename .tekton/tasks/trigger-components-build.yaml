@@ -15,7 +15,7 @@ spec:
       description: Name of the Kubernetes secret containing Git credentials
       type: string
     - name: changed-components
-      description: JSON array of changed component directories
+      description: Bash-like space-separated list of changed component directories
       type: string
     - name: max-concurrent-builds
       description: Maximum number of concurrent builds
@@ -43,19 +43,22 @@ spec:
         #!/bin/bash
         set -e
 
-        COMPONENTS="$(params.changed-components)"
+        COMPONENTS_RAW="$(params.changed-components)"
         MAX_CONCURRENT="$(params.max-concurrent-builds)"
         REVISION="$(params.revision)"
         NAMESPACE="$(params.pipeline-namespace)"
         REPO_URL="$(params.repo-url)"
         IMAGE_REGISTRY="$(params.image-registry)"
 
+        # Convert space-separated input into a Bash array
+        read -r -a COMPONENTS <<< "$COMPONENTS_RAW"
+
         COMMIT_SHA_SHORT="${REVISION:0:7}"
 
-        echo "$COMPONENTS"
+        echo "$COMPONENTS_RAW"
 
         # Check if no changed components detected, then returns early
-        if [ "$COMPONENTS" = "[]" ]; then
+        if [ -z "$COMPONENTS_RAW" ] || [ "$COMPONENTS_RAW" = "[]" ]; then
             echo "No changed components detected. Skipping build."
             echo -n "0" > $(results.build-count.path)
             echo -n "" > $(results.pipeline-names.path)
@@ -66,21 +69,13 @@ spec:
         CREATED_RUNS=""
         RUN_COUNT=0
 
-        # Use jq to extract array elements if available, fallback to manual parsing
-        if command -v jq >/dev/null 2>&1; then
-            COMPONENT_LIST=$(echo "$COMPONENTS" | jq -r '.[]')
-        else
-            # Manual JSON parsing for minimal environments
-            COMPONENT_LIST=$(echo "$COMPONENTS" | tr -d '[]"' | tr ',' '\n')
-        fi
-
         echo "---Triggering builds for changed components---"
 
-        for component in "${COMPONENT_LIST[@]}"; do
+        for component in "${COMPONENTS[@]}"; do
             component=$(echo "$component" | xargs)
 
             if [ -z "$component" ]; then
-            continue
+              continue
             fi
 
             component_name="${component//\//-}"
