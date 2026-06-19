@@ -23,6 +23,6 @@ spec:
 
         git config --global --add safe.directory .
 
-        changed_dirs="$(git diff HEAD~1 HEAD --name-only | xargs -I {} dirname "{}" | sort -u | awk 'BEGIN{printf "["} {if (NR>1) printf ","; printf "\"%s\"", $0} END{printf "]"}')"
+        changed_dirs="$(git diff HEAD~1 HEAD --name-only | xargs -I {} dirname "{}" | sort -u | tr '\n' ' ' | sed 's/[[:space:]]*$//')"
 
         printf "%s" "$changed_dirs" | tee "$(results.changed-dirs.path)"

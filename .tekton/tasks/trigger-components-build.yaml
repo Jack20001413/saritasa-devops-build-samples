@@ -50,11 +50,7 @@ spec:
         REPO_URL="$(params.repo-url)"
         IMAGE_REGISTRY="$(params.image-registry)"
 
-        echo "$COMPONENTS"
-
         COMMIT_SHA_SHORT="${REVISION:0:7}"
-        # COMPONENTS="${COMPONENTS#'}"
-        # COMPONENTS="${COMPONENTS%'}"
 
         echo "$COMPONENTS"
 
