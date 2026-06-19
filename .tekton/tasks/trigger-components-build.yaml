@@ -16,7 +16,7 @@ spec:
       type: string
     - name: changed-components
       description: JSON array of changed component directories
-      type: array
+      type: string
     - name: max-concurrent-builds
       description: Maximum number of concurrent builds
       type: string
