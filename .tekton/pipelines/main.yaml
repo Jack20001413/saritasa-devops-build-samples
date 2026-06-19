@@ -25,9 +25,9 @@ spec:
         name: git-clone
       params:
         - name: url
-          value: $(params.repo_url)
+          value: "$(params.repo_url)"
         - name: revision
-          value: $(params.revision)
+          value: "$(params.revision)"
         - name: depth
           value: "0"
         - name: deleteExisting
@@ -54,13 +54,13 @@ spec:
         - detect-changed-components
       params:
         - name: repo-url
-          value: $(params.repo_url)
+          value: "$(params.repo_url)"
         - name: revision
-          value: $(params.revision)
+          value: "$(params.revision)"
         - name: git-auth-secret-name
-          value: $(params.git-auth-secret-name)
+          value: "$(params.git-auth-secret-name)"
         - name: changed-components
-          value: $(tasks.detect-changed-components.results.changed-dirs[*])
+          value: "$(tasks.detect-changed-components.results.changed-dirs)"
         - name: max-concurrent-builds
           value: "5"
       workspaces:
