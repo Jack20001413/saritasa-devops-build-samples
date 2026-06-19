@@ -86,58 +86,58 @@ spec:
             echo "PipelineRun name: $PIPELINE_RUN_NAME"
             echo "Namespace: $NAMESPACE"
 
-            cat << -EOF | kubectl apply -f -
-            apiVersion: tekton.dev/v1
-            kind: PipelineRun
-            metadata:
-                name: $PIPELINE_RUN_NAME
-                namespace: $NAMESPACE
-                labels:
-                tekton.dev/pipeline: build-deploy-component
-                annotations:
-                #   pipelinesascode.tekton.dev/on-event: "[incoming]"
-                #   pipelinesascode.tekton.dev/on-target-branch: "[main]"
-                pipelinesascode.tekton.dev/task: "[git-clone]"
-                pipelinesascode.tekton.dev/max-keep-runs: "5"
-            spec:
-                timeout: 1h
+            cat << EOF | kubectl apply -f -
+          apiVersion: tekton.dev/v1
+          kind: PipelineRun
+          metadata:
+              name: $PIPELINE_RUN_NAME
+              namespace: $NAMESPACE
+              labels:
+              tekton.dev/pipeline: build-deploy-component
+              annotations:
+              #   pipelinesascode.tekton.dev/on-event: "[incoming]"
+              #   pipelinesascode.tekton.dev/on-target-branch: "[main]"
+              pipelinesascode.tekton.dev/task: "[git-clone]"
+              pipelinesascode.tekton.dev/max-keep-runs: "5"
+          spec:
+              timeout: 1h
 
-                # serviceAccountName: build-pipeline-sa
+              # serviceAccountName: build-pipeline-sa
 
-                params:
-                - name: repo-url
-                    value: $REPO_URL
-                - name: revision
-                    value: $REVISION
-                - name: project-dir
-                    value: $component
-                - name: image-url
-                    value: $IMAGE_REGISTRY/$component_name
-                - name: image-tag
-                    value: $COMMIT_SHA_SHORT
+              params:
+              - name: repo-url
+                  value: $REPO_URL
+              - name: revision
+                  value: $REVISION
+              - name: project-dir
+                  value: $component
+              - name: image-url
+                  value: $IMAGE_REGISTRY/$component_name
+              - name: image-tag
+                  value: $COMMIT_SHA_SHORT
 
-                pipelineRef:
-                  name: trigger-build-component
+              pipelineRef:
+                name: trigger-build-component
 
-                workspaces:
-                - name: source
-                  volumeClaimTemplate:
-                    spec:
-                        accessModes:
-                        - ReadWriteOnce
-                        resources:
-                          requests:
-                            storage: 1Gi
+              workspaces:
+              - name: source
+                volumeClaimTemplate:
+                  spec:
+                      accessModes:
+                      - ReadWriteOnce
+                      resources:
+                        requests:
+                          storage: 1Gi
 
-                - name: basic-auth
-                    secret:
-                      secretName: "$(params.git-auth-secret-name)"
+              - name: basic-auth
+                  secret:
+                    secretName: "$(params.git-auth-secret-name)"
 
-                # Docker config
-                #   - name: docker-config
-                #     secret:
-                #       secretName: docker-config
-            EOF
+              # Docker config
+              #   - name: docker-config
+              #     secret:
+              #       secretName: docker-config
+          EOF
 
             if [ $? -eq 0 ]; then
               echo "PipelineRun created successfully"
