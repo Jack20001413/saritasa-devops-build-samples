@@ -53,6 +53,7 @@ spec:
         NAMESPACE="$(params.pipeline-namespace)"
         REPO_URL="$(params.repo-url)"
         IMAGE_REGISTRY="$(params.image-registry)"
+        GIT_AUTH_SECRET_NAME="$(params.git-auth-secret-name)"
 
         # Convert space-separated input into a Bash array
         read -r -a COMPONENTS <<< "$COMPONENTS_RAW"
@@ -91,14 +92,14 @@ spec:
             echo "Namespace: $NAMESPACE"
 
             # Replace values into the PipelineRun template
-            yq '.metadata.name = "$PIPELINE_RUN_NAME" 
-              | .metadata.namespace = "$NAMESPACE" 
-              | .spec.params[] |= (select(.name == "repo-url") .value = "$REPO_URL") 
-              | .spec.params[] |= (select(.name == "revision") .value = "$REVISION") 
-              | .spec.params[] |= (select(.name == "project-dir") .value = "$component_name") 
-              | .spec.params[] |= (select(.name == "image-url") .value = "$IMAGE_REGISTRY/$component_name") 
-              | .spec.params[] |= (select(.name == "image-tag") .value = "$COMMIT_SHA_SHORT") 
-              | .spec.workspaces[] |= (select(.name == "basic-auth") .secret.secretName = "$(params.git-auth-secret-name)")' \
+            yq ".metadata.name = \"$PIPELINE_RUN_NAME\" 
+              | .metadata.namespace = \"$NAMESPACE\" 
+              | .spec.params[] |= (select(.name == \"repo-url\") .value = \"$REPO_URL\") 
+              | .spec.params[] |= (select(.name == \"revision\") .value = \"$REVISION\") 
+              | .spec.params[] |= (select(.name == \"project-dir\") .value = \"$component_name\") 
+              | .spec.params[] |= (select(.name == \"image-url\") .value = \"$IMAGE_REGISTRY/$component_name\") 
+              | .spec.params[] |= (select(.name == \"image-tag\") .value = \"$COMMIT_SHA_SHORT\") 
+              | .spec.workspaces[] |= (select(.name == \"basic-auth\") .secret.secretName = \"$GIT_AUTH_SECRET_NAME\")" \
             .tekton/template/trigger-component-build-run.yaml \
             | kubectl apply -f -
 
