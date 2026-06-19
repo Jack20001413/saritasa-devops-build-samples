@@ -143,11 +143,11 @@ spec:
             EOF
 
             if [ $? -eq 0 ]; then
-            echo "PipelineRun created successfully"
-            CREATED_RUNS="${CREATED_RUNS}${CREATED_RUNS:+,}${PIPELINE_RUN_NAME}"
-            RUN_COUNT=$((RUN_COUNT+1))
+              echo "PipelineRun created successfully"
+              CREATED_RUNS="${CREATED_RUNS}${CREATED_RUNS:+,}${PIPELINE_RUN_NAME}"
+              RUN_COUNT=$((RUN_COUNT+1))
             else
-            echo "Failed to create PipelineRun"
+              echo "Failed to create PipelineRun"
             fi
                     
             # Scarcity control
@@ -157,12 +157,12 @@ spec:
             | tail -n +2 | wc -l)
 
             while [ $RUNNING_BUILDS -ge $MAX_CONCURRENT ]; do
-            echo "Waiting for available slots: running $RUNNING_BUILDS, max $MAX_CONCURRENT"
-            sleep 10
-            RUNNING_BUILDS=$(kubectl get pipelineruns -n $NAMESPACE \
-                -l tekton.dev/pipeline=build-deploy-component \
-                --field-selector=status.conditions[0].status=True 2>/dev/null \
-                | tail -n +2 | wc -l)
+              echo "Waiting for available slots: running $RUNNING_BUILDS, max $MAX_CONCURRENT"
+              sleep 10
+              RUNNING_BUILDS=$(kubectl get pipelineruns -n $NAMESPACE \
+                  -l tekton.dev/pipeline=build-deploy-component \
+                  --field-selector=status.conditions[0].status=True 2>/dev/null \
+                  | tail -n +2 | wc -l)
             done
         done
 
@@ -172,4 +172,4 @@ spec:
         echo "Total PipelineRuns created: $RUN_COUNT"
 
         echo -n "$RUN_COUNT" > $(results.build-count.path)
-        echo -n "$CREATED_RUNS" > $(results.pipelines-name.path)
+        echo -n "$CREATED_RUNS" > $(results.pipeline-names.path)
