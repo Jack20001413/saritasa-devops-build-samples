@@ -65,6 +65,13 @@ spec:
 
         COMMIT_SHA_SHORT="${REVISION:0:7}"
 
+        # Install tkn-pac
+        curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/pipelines/1.13.0/tkn-linux-amd64.tar.gz
+        tar -xvzf tkn-linux-amd64.tar.gz
+        mv tkn-pac /usr/local/bin/
+
+        tkn-pac version
+
         # Check if no changed components detected, then returns early
         if [ -z "$COMPONENTS_RAW" ] || [ "$COMPONENTS_RAW" = "[]" ]; then
             echo "No changed components detected. Skipping build."
