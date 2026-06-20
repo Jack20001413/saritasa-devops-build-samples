@@ -36,6 +36,7 @@ spec:
 
   workspaces:
     - name: source
+    - name: basic-auth
 
   results:
     - name: build-count
@@ -45,7 +46,8 @@ spec:
 
   steps:
     - name: trigger-build
-      image: alpine/k8s:1.33.13
+      image: ghcr.io/openshift-pipelines/pipelines-as-code-tkn-pac:latest
+      # image: alpine/k8s:1.33.13
       workingDir: $(workspaces.source.path)
       script: |
         #!/bin/bash
@@ -63,8 +65,6 @@ spec:
         read -r -a COMPONENTS <<< "$COMPONENTS_RAW"
 
         COMMIT_SHA_SHORT="${REVISION:0:7}"
-
-        echo "$COMPONENTS_RAW"
 
         # Check if no changed components detected, then returns early
         if [ -z "$COMPONENTS_RAW" ] || [ "$COMPONENTS_RAW" = "[]" ]; then
@@ -106,7 +106,7 @@ spec:
               | .spec.params[] |= (select(.name == \"image-tag\") .value = \"$COMMIT_SHA_SHORT\") 
               | .spec.workspaces[] |= (select(.name == \"basic-auth\") .secret.secretName = \"$GIT_AUTH_SECRET_NAME\")" \
             "$(params.template-filepath)" \
-            | kubectl apply -f -
+            | tkn-pac resolve --no-secret -f -
 
             if [ $? -eq 0 ]; then
               echo "PipelineRun created successfully"

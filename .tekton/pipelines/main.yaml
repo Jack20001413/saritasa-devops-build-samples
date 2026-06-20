@@ -65,6 +65,8 @@ spec:
           value: 5
         - name: template-filepath
           value: ".tekton/trigger-component-build-run-template.yaml"
+        - name: pipeline-namespace
+          value: "saritasa-devops-build-samples-pipelines"
       workspaces:
         - name: source
           workspace: source
