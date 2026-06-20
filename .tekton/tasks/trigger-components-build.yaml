@@ -29,6 +29,10 @@ spec:
       description: Docker image registry URL
       type: string
       default: "docker.io"
+    - name: template-filepath
+      description: Filepath of the PipelineRun template
+      type: string
+      default: ".tekton"
 
   workspaces:
     - name: source
@@ -101,7 +105,7 @@ spec:
               | .spec.params[] |= (select(.name == \"image-url\") .value = \"$IMAGE_REGISTRY/$component_name\") 
               | .spec.params[] |= (select(.name == \"image-tag\") .value = \"$COMMIT_SHA_SHORT\") 
               | .spec.workspaces[] |= (select(.name == \"basic-auth\") .secret.secretName = \"$GIT_AUTH_SECRET_NAME\")" \
-            .tekton/template/trigger-component-build-run.yaml \
+            "$(params.template-filepath)" \
             | kubectl apply -f -
 
             if [ $? -eq 0 ]; then
@@ -117,6 +121,11 @@ spec:
             -l tekton.dev/pipeline=build-deploy-component \
             --field-selector=status.conditions[0].status=True 2>/dev/null \
             | tail -n +2 | wc -l)
+
+            if [ $RUNNING_BUILDS -eq 0 ]; then
+              echo "No running builds detected."
+              exit 1
+            fi
 
             while [ $RUNNING_BUILDS -ge $MAX_CONCURRENT ]; do
               echo "Waiting for available slots: running $RUNNING_BUILDS, max $MAX_CONCURRENT"

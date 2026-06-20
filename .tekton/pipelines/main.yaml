@@ -63,6 +63,8 @@ spec:
           value: "$(tasks.detect-changed-components.results.changed-dirs)"
         - name: max-concurrent-builds
           value: 5
+        - name: template-filepath
+          value: ".tekton/trigger-component-build-run-template.yaml"
       workspaces:
         - name: source
           workspace: source
