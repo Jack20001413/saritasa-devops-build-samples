@@ -154,10 +154,12 @@ tkn pac create repository
 ? Please enter the namespace where the pipeline should run (default: default): <Namespace for containing pipeline runs>
 ```
 
-### Create a Kubernetes secret for access Docker Registry
+### Create a Kubernetes secret to access Docker Registry
 
-Use this command to create a secret for holding credentials to access a Docker Registry
+Use this command to create a K8S secret to hold content of the Docker's `config.json` file. This secret is then used for a task to push image to Docker registry.
 
 ```sh
-kubectl create secret docker-cred regcred --docker-username=<your-name> --docker-password=<your-pword> --docker-email=<your-email>
+kubectl create secret generic docker-config --from-file=.dockerconfigjson="$HOME/.docker/config.json" --type=kubernetes.io/dockerconfigjson -n $(k get repository -A -o jsonpath='{.items[0].metadata.namespace}')
 ```
+
+***Note***: Considering there's only 1 namespace containing all Respository CRs

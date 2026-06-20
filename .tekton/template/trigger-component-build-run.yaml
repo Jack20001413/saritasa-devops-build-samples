@@ -8,7 +8,8 @@ metadata:
     pipelinesascode.tekton.dev/task: "[git-clone]"
     pipelinesascode.tekton.dev/max-keep-runs: "5"
 spec:
-  timeouts: 1h
+  timeouts:
+    pipeline: 1h
 
   # serviceAccountName: build-pipeline-sa
 
