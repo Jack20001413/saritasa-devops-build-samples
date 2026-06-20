@@ -3,8 +3,7 @@ kind: PipelineRun
 metadata:
   name: "{{ pipeline_run_name }}"
   namespace: "{{ namespace }}"
-  labels:
-    tekton.dev/pipeline: build-deploy-component
+  annotations:
     pipelinesascode.tekton.dev/task: "[git-clone]"
     pipelinesascode.tekton.dev/max-keep-runs: "5"
 spec:
