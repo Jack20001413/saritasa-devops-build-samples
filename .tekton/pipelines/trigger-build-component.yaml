@@ -27,8 +27,8 @@ spec:
     - name: basic-auth
       description: Git credentials
       optional: true
-    # - name: docker-credentials
-    #   description: Docker credentials for pushing image
+    # - name: docker-config
+    #   description: Docker's config.json for pushing image
     #   optional: true
 
   results:
