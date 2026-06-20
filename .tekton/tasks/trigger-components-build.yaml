@@ -67,7 +67,7 @@ spec:
 
         # Install tkn-pac
         apk add --no-cache gcompat
-        
+
         curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/pipelines/1.13.0/tkn-linux-amd64.tar.gz
         tar -xvzf tkn-linux-amd64.tar.gz
         mv tkn-pac /usr/local/bin/
@@ -116,7 +116,7 @@ spec:
               | .spec.params[] |= (select(.name == \"image-tag\") .value = \"$COMMIT_SHA_SHORT\") 
               | .spec.workspaces[] |= (select(.name == \"basic-auth\") .secret.secretName = \"$GIT_AUTH_SECRET_NAME\")" \
             "$(params.template-filepath)" \
-            | tkn-pac resolve --no-secret -f -
+            | tkn-pac resolve --no-secret -f - | k apply -f -
 
             if [ $? -eq 0 ]; then
               echo "PipelineRun created successfully"
