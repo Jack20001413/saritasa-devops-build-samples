@@ -25,7 +25,7 @@ spec:
       value: "{{ image_tag }}"
 
   pipelineRef:
-    name: trigger-build-component
+    name: trigger-build-deploy-changed-component
 
   workspaces:
     - name: source

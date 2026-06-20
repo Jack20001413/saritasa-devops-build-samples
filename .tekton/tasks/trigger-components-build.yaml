@@ -122,10 +122,17 @@ spec:
             --field-selector=status.conditions[0].status=True 2>/dev/null \
             | tail -n +2 | wc -l)
 
-            if [ $RUNNING_BUILDS -eq 0 ]; then
+            count="1"
+            while [ $RUNNING_BUILDS -eq 0 ]; do
+              if [ $count -eq "10" ]; then
+                echo "PipelineRun $PIPELINE_RUN_NAME failed to start after $((count*10)) seconds"
+                break
+              fi
+
               echo "No running builds detected."
-              exit 1
-            fi
+              count=$((count+1))
+              sleep 10s
+            done
 
             while [ $RUNNING_BUILDS -ge $MAX_CONCURRENT ]; do
               echo "Waiting for available slots: running $RUNNING_BUILDS, max $MAX_CONCURRENT"
