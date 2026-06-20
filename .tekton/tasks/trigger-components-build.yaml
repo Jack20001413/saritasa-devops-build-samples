@@ -36,7 +36,6 @@ spec:
 
   workspaces:
     - name: source
-    - name: basic-auth
 
   results:
     - name: build-count
