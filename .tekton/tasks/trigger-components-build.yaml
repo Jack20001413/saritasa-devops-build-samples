@@ -115,7 +115,7 @@ spec:
               | .spec.params[] |= (select(.name == \"image-tag\") .value = \"$COMMIT_SHA_SHORT\") 
               | .spec.workspaces[] |= (select(.name == \"basic-auth\") .secret.secretName = \"$GIT_AUTH_SECRET_NAME\")" \
             "$(params.template-filepath)" > template.yaml
-            tkn-pac resolve --no-secret -f template.yaml | kubectl apply -f -
+            kubectl apply -f template.yaml
 
             if [ $? -eq 0 ]; then
               echo "PipelineRun created successfully"
