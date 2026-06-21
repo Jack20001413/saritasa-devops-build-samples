@@ -15,7 +15,7 @@ spec:
         #!/bin/bash
         set -eu
 
-        TEKTON_RESOURCES_DIR=(".tekton/pipelines" ".tekton/tasks")
+        TEKTON_RESOURCES_DIR=(".tekton/tasks" ".tekton/pipelines")
 
         for dir in "${TEKTON_RESOURCES_DIR[@]}"; do
             echo ""
