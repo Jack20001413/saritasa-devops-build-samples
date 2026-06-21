@@ -47,11 +47,20 @@ spec:
         - name: source
           workspace: source
 
+    - name: create-tekton-resources
+      taskRef:
+        name: create-tekton-resources
+      runAfter:
+        - detect-changed-components
+      workspaces:
+        - name: source
+          workspace: source
+
     - name: build-push-deploy-changed-components
       taskRef:
         name: trigger-components-build
       runAfter:
-        - detect-changed-components
+        - create-tekton-resources
       params:
         - name: repo-url
           value: "$(params.repo_url)"
