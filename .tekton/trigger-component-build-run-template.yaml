@@ -4,7 +4,6 @@ metadata:
   name: "{{ pipeline_run_name }}"
   namespace: "{{ namespace }}"
   annotations:
-    pipelinesascode.tekton.dev/task: "[https://github.com/tektoncd/catalog/blob/main/task/git-clone/0.10/git-clone.yaml]"
     pipelinesascode.tekton.dev/max-keep-runs: "5"
 spec:
   timeouts:
@@ -25,7 +24,7 @@ spec:
       value: "{{ image_tag }}"
 
   pipelineRef:
-    name: trigger-build-deploy-changed-component
+    name: build-deploy-single-component
 
   workspaces:
     - name: source
