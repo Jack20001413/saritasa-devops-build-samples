@@ -21,6 +21,7 @@ spec:
             echo ""
             echo "Creating resources in $dir..."
             find "$dir" -type f | while read -r file; do
+                echo "$file"
                 kubectl apply -f $file
             done
         done
