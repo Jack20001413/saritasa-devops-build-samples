@@ -9,6 +9,7 @@ metadata:
 spec:
   timeouts:
     pipeline: 1h
+    
 
   # serviceAccountName: build-pipeline-sa
 
