@@ -31,11 +31,6 @@ spec:
     #   description: Docker's config.json for pushing image
     #   optional: true
 
-  results:
-    - name: image-url
-      description: URL of the image built
-      value: $(tasks.pack-build-component.results.image-full-url)
-
   tasks:
     - name: clone-repository
       taskRef:
