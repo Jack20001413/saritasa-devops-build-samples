@@ -15,17 +15,9 @@ spec:
         #!/bin/bash
         set -eu
 
-        TEKTON_RESOURCES_DIR=(.tekton/pipelines .tekton/tasks)
+        TEKTON_RESOURCES_DIR=(".tekton/pipelines" ".tekton/tasks")
 
         for dir in "${TEKTON_RESOURCES_DIR[@]}"; do
-            resource=$(basename "$dir")
-            resource_count=$(kubectl get "$resource" -A --no-headers 2>/dev/null | wc -l)
-            
-            if [ "$resource_count" -lt 2 ]; then
-                echo "Kind \'"$resource"\' already exists in the cluster. Skipping creation."
-                continue
-            fi
-
             echo ""
             echo "Creating resources in $dir..."
             find "$dir" -type f | while read -r file; do

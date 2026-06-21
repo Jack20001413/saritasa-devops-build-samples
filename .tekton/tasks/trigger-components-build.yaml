@@ -45,7 +45,6 @@ spec:
 
   steps:
     - name: trigger-build
-      # image: ghcr.io/openshift-pipelines/pipelines-as-code-tkn-pac:latest
       image: alpine/k8s:1.33.13
       workingDir: $(workspaces.source.path)
       script: |
