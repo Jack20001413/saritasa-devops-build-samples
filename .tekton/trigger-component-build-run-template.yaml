@@ -4,7 +4,7 @@ metadata:
   name: "{{ pipeline_run_name }}"
   namespace: "{{ namespace }}"
   annotations:
-    pipelinesascode.tekton.dev/task: "[git-clone]"
+    pipelinesascode.tekton.dev/task: "[https://github.com/tektoncd/catalog/blob/main/task/git-clone/0.10/git-clone.yaml]"
     pipelinesascode.tekton.dev/max-keep-runs: "5"
 spec:
   timeouts:
