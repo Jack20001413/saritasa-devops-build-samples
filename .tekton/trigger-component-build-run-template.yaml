@@ -24,14 +24,15 @@ spec:
   # Cluster resolver is used here because this Pipeline template is triggered with K8s native api,
   # so kube-api-server doesn't know how to resolve pipeline reference locally.
   pipelineRef:
-    resolver: cluster
-    params:
-      - name: name
-        value: build-deploy-single-component
-      - name: namespace
-        value: tekton-pipelines
-      - name: kind
-        value: pipeline
+    name: build-deploy-single-component
+    # resolver: cluster
+    # params:
+    #   - name: name
+    #     value: build-deploy-single-component
+    #   - name: namespace
+    #     value: tekton-pipelines
+    #   - name: kind
+    #     value: pipeline
 
   workspaces:
     - name: source
