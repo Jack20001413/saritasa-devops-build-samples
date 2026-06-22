@@ -35,6 +35,14 @@ spec:
         #!/bin/bash
         set -eu
 
+        DOCKER_CONFIG_PATH="$(workspaces.docker-config.path)"
+        
+        # Check if Docker config is provided
+        if [ -d "$DOCKER_CONFIG_PATH" ] && [ -f "$DOCKER_CONFIG_PATH/config.json" ]; then
+          echo "Using Docker config from workspace"
+          export DOCKER_CONFIG="$DOCKER_CONFIG_PATH"
+        fi
+
         pack build $(params.image-url) --tag $(params.image-tag) --builder paketobuildpacks/builder-jammy-full
         
         echo -n "$(params.image-url):$(params.image-tag)" > $(results.image-full-url.path)
