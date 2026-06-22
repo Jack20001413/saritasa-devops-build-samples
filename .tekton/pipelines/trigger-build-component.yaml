@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
   name: build-deploy-single-component
-  namespace: tekton-pipelines
+  namespace: saritasa-devops-build-samples-pipelines
 spec:
   params:
     - name: repo-url
@@ -27,9 +27,9 @@ spec:
     - name: basic-auth
       description: Git credentials
       optional: true
-    # - name: docker-config
-    #   description: Docker's config.json for pushing image
-    #   optional: true
+    - name: docker-config
+      description: Docker's config.json for pushing image
+      optional: true
 
   tasks:
     - name: clone-repository
@@ -56,7 +56,7 @@ spec:
     
     - name: build-component
       taskRef:
-        name: pack-build-image
+        name: build-push-image
         # resolver: cluster
         # params:
         #   - name: name
@@ -77,6 +77,8 @@ spec:
       workspaces:
         - name: source
           workspace: source
+        - name: docker-config
+          workspace: docker-config
 
     # - name: push-to-registry
     #   taskRef:

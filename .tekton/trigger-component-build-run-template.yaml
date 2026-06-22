@@ -50,6 +50,6 @@ spec:
         secretName: "{{ git_auth_secret_name }}"
 
     # Docker config
-    #   - name: docker-config
-    #     secret:
-    #       secretName: docker-config
+    - name: docker-config
+      secret:
+        secretName: docker-config

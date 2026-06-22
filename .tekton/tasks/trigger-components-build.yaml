@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: trigger-components-build
-  namespace: tekton-pipelines
+  namespace: saritasa-devops-build-samples-pipelines
 spec:
   params:
     - name: repo-url

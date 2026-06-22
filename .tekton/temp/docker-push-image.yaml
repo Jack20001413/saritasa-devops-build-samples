@@ -3,7 +3,7 @@
 # kind: Task
 # metadata:
 #   name: docker-push-image
-#   namespace: tekton-pipelines
+#   namespace: saritasa-devops-build-samples-pipelines
 #   annotations:
 #     description: A task to push a OCI image to a registry
 # spec:

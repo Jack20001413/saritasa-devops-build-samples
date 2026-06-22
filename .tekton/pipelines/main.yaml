@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
   name: main-pipeline
-  namespace: tekton-pipelines
+  namespace: saritasa-devops-build-samples-pipelines
 spec:
   params:
     - name: repo_url

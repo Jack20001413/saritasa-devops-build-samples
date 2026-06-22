@@ -2,7 +2,7 @@
 # kind: Task
 # metadata:
 #   name: deploy-to-kubernetes
-#   namespace: tekton-pipelines
+#   namespace: saritasa-devops-build-samples-pipelines
 # spec:
 #   params:
 #     - name: component-name

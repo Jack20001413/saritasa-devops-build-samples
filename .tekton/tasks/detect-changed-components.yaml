@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: detect-changed-components
-  namespace: tekton-pipelines
+  namespace: saritasa-devops-build-samples-pipelines
 spec:
   workspaces:
     - name: source

@@ -1,8 +1,8 @@
 apiVersion: tekton.dev/v1
 kind: Task
 metadata:
-  name: pack-build-image
-  namespace: tekton-pipelines
+  name: build-push-image
+  namespace: saritasa-devops-build-samples-pipelines
 spec:
   description: A task to build source code using Buildpacks pack CLI
 
@@ -16,10 +16,13 @@ spec:
 
   workspaces:
     - name: source
+    - name: docker-config
 
   results:
     - name: image-full-url
       description: Full URL of the built image
+    - name: push-result
+      description: Whether image is pushed successfully or failed
 
   steps:
     - name: build-image
@@ -32,3 +35,40 @@ spec:
         pack build $(params.image-url) --tag $(params.image-tag) --builder paketobuildpacks/builder-jammy-full
         
         echo -n "$(params.image-url):$(params.image-tag)" > $(results.image-full-url.path)
+
+    - name: push-image
+      image: docker:latest
+      env:
+        - name: DOCKER_HOST
+          value: unix:///var/run/docker.sock
+      script: |
+        #!/bin/bash
+        set -e
+
+        IMAGE_URL="$(params.image-url):$(params.image-tag)"
+        DOCKER_CONFIG_PATH="$(workspaces.docker-config.path)"
+
+        echo "--- Pushing $IMAGE_URL ---"
+
+        # Check if Docker config is provided
+        if [ -d "$DOCKER_CONFIG_PATH" ] && [ -f "$DOCKER_CONFIG_PATH/config.json" ]; then
+          echo "Using Docker config from workspace"
+          export DOCKER_CONFIG="$DOCKER_CONFIG_PATH"
+        fi
+
+        # Push image
+        echo "Pushing image $IMAGE_URL"
+        if docker push $IMAGE_URL; then
+          echo ""
+          echo "Image pushed successfully"
+          echo "Image URL: $IMAGE_URL"
+
+          # Write result
+          echo -n "successful" > $(results.push-result.path)
+        else
+          echo ""
+          echo "Failed to push image $IMAGE_URL"
+
+          echo -n "failed" > $(results.push-result.path)
+          exit 1
+        fi
