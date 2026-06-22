@@ -9,7 +9,7 @@ spec:
   timeouts:
     pipeline: 1h
 
-  # serviceAccountName: build-pipeline-sa
+  serviceAccountName: tekton-pipeline-builder
 
   params:
     - name: repo-url

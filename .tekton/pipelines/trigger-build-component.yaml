@@ -34,14 +34,15 @@ spec:
   tasks:
     - name: clone-repository
       taskRef:
-        resolver: cluster
-        params:
-          - name: name
-            value: git-clone
-          - name: namespace
-            value: tekton-pipeline
-          - name: kind
-            value: task
+        name: git-clone
+        # resolver: cluster
+        # params:
+        #   - name: name
+        #     value: git-clone
+        #   - name: namespace
+        #     value: tekton-pipeline
+        #   - name: kind
+        #     value: task
       params:
         - name: url
           value: $(params.repo-url)
@@ -55,14 +56,15 @@ spec:
     
     - name: build-component
       taskRef:
-        resolver: cluster
-        params:
-          - name: name
-            value: pack-build-image
-          - name: namespace
-            value: tekton-pipeline
-          - name: kind
-            value: task
+        name: pack-build-image
+        # resolver: cluster
+        # params:
+        #   - name: name
+        #     value: pack-build-image
+        #   - name: namespace
+        #     value: tekton-pipeline
+        #   - name: kind
+        #     value: task
       runAfter:
         - clone-repository
       params:
