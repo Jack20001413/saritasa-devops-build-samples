@@ -29,7 +29,6 @@ spec:
       optional: true
     - name: docker-config
       description: Docker's config.json for pushing image
-      optional: true
 
   tasks:
     - name: clone-repository
