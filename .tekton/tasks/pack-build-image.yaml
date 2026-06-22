@@ -3,9 +3,9 @@ kind: Task
 metadata:
   name: pack-build-image
   namespace: tekton-pipelines
-  annotations:
-    description: A task to build source code using Buildpacks pack CLI
 spec:
+  description: A task to build source code using Buildpacks pack CLI
+
   params:
     - name: image-url
       description: URL of the image to be built and pushed
