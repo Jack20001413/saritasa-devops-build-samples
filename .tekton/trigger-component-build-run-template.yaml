@@ -23,6 +23,8 @@ spec:
     - name: image-tag
       value: "{{ image_tag }}"
 
+  # Cluster resolver is used here because this Pipeline template is triggered with K8s native api,
+  # so kube-api-server doesn't know how to resolve pipeline reference locally.
   pipelineRef:
     resolver: cluster
     params:

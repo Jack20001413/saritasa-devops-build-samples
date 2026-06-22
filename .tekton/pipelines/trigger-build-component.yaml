@@ -46,22 +46,21 @@ spec:
         - name: basic-auth
           workspace: basic-auth
     
-    
-    # - name: build-component
-    #   taskRef:
-    #     name: pack-build-image
-    #   runAfter:
-    #     - clone-repository
-    #   params:
-    #     - name: image-url
-    #       value: $(params.image-url)
-    #     - name: image-tag
-    #       value: $(params.image-tag)
-    #     - name: component-dir
-    #       value: $(params.project-dir)
-    #   workspaces:
-    #     - name: source
-    #       workspace: source
+    - name: build-component
+      taskRef:
+        name: pack-build-image
+      runAfter:
+        - clone-repository
+      params:
+        - name: image-url
+          value: $(params.image-url)
+        - name: image-tag
+          value: $(params.image-tag)
+        - name: component-dir
+          value: $(params.project-dir)
+      workspaces:
+        - name: source
+          workspace: source
 
     # - name: push-to-registry
     #   taskRef:
