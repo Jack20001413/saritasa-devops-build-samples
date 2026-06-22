@@ -52,7 +52,7 @@ spec:
         params:
           - name: name
             value: pack-build-image
-          - name: namespace:
+          - name: namespace
             value: tekton-pipeline
           - name: kind
             value: task
