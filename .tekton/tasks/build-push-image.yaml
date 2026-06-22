@@ -4,7 +4,7 @@ metadata:
   name: build-push-image
   namespace: saritasa-devops-build-samples-pipelines
 spec:
-  description: A task to build source code using Buildpacks pack CLI
+  description: A task to build source code using Buildpacks pack CLI and push image using Docker CLI
 
   params:
     - name: image-url
@@ -28,9 +28,12 @@ spec:
     - name: build-image
       image: buildpacksio/pack:base
       workingDir: $(workspaces.source.path)/$(params.component-dir)
+      env:
+        - name: DOCKER_HOST
+          value: unix:///var/run/docker.sock
       script: |
         #!/bin/bash
-        set -e
+        set -eu
 
         pack build $(params.image-url) --tag $(params.image-tag) --builder paketobuildpacks/builder-jammy-full
         
