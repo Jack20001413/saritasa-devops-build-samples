@@ -64,17 +64,6 @@ spec:
 
         COMMIT_SHA_SHORT="${REVISION:0:7}"
 
-        # Install tkn-pac
-        apk add --no-cache gcompat
-
-        curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/pipelines/1.13.0/tkn-linux-amd64.tar.gz
-        tar -xvzf tkn-linux-amd64.tar.gz
-        mv tkn-pac /usr/local/bin/
-
-        ls -la /usr/local/bin
-
-        tkn-pac version
-
         # Check if no changed components detected, then returns early
         if [ -z "$COMPONENTS_RAW" ] || [ "$COMPONENTS_RAW" = "[]" ]; then
             echo "No changed components detected. Skipping build."
@@ -114,8 +103,7 @@ spec:
               | .spec.params[] |= (select(.name == \"image-url\") .value = \"$IMAGE_REGISTRY/$component_name\") 
               | .spec.params[] |= (select(.name == \"image-tag\") .value = \"$COMMIT_SHA_SHORT\") 
               | .spec.workspaces[] |= (select(.name == \"basic-auth\") .secret.secretName = \"$GIT_AUTH_SECRET_NAME\")" \
-            "$(params.template-filepath)" > template.yaml
-            kubectl apply -f template.yaml
+            "$(params.template-filepath)" | kubectl apply -f -
 
             if [ $? -eq 0 ]; then
               echo "PipelineRun created successfully"
@@ -130,18 +118,6 @@ spec:
             -l tekton.dev/pipeline=build-deploy-component \
             --field-selector=status.conditions[0].status=True 2>/dev/null \
             | tail -n +2 | wc -l)
-
-            count="1"
-            while [ $RUNNING_BUILDS -eq 0 ]; do
-              if [ $count -eq "10" ]; then
-                echo "PipelineRun $PIPELINE_RUN_NAME failed to start after $((count*10)) seconds"
-                break
-              fi
-
-              echo "No running builds detected."
-              count=$((count+1))
-              sleep 10s
-            done
 
             while [ $RUNNING_BUILDS -ge $MAX_CONCURRENT ]; do
               echo "Waiting for available slots: running $RUNNING_BUILDS, max $MAX_CONCURRENT"
