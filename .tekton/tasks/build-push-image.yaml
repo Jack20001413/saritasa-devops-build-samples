@@ -24,6 +24,10 @@ spec:
     - name: push-result
       description: Whether image is pushed successfully or failed
 
+  volumes:
+    - name: docker-socket
+      emptyDir: {}
+
   steps:
     - name: build-image
       image: buildpacksio/pack:base
@@ -31,12 +35,15 @@ spec:
       env:
         - name: DOCKER_HOST
           value: unix:///var/run/docker.sock
+      volumeMounts:
+        - name: docker-socket
+          mountPath: /var/run
       script: |
         #!/bin/bash
         set -eu
 
         DOCKER_CONFIG_PATH="$(workspaces.docker-config.path)"
-        
+
         # Check if Docker config is provided
         if [ -d "$DOCKER_CONFIG_PATH" ] && [ -f "$DOCKER_CONFIG_PATH/config.json" ]; then
           echo "Using Docker config from workspace"
