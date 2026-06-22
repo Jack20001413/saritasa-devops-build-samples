@@ -34,7 +34,14 @@ spec:
   tasks:
     - name: clone-repository
       taskRef:
-        name: git-clone
+        resolver: cluster
+        params:
+          - name: name
+            value: git-clone
+          - name: namespace
+            value: tekton-pipeline
+          - name: kind
+            value: task
       params:
         - name: url
           value: $(params.repo-url)
