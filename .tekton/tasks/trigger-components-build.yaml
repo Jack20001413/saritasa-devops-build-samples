@@ -103,7 +103,7 @@ spec:
               | .spec.params[] |= (select(.name == \"image-url\") .value = \"$IMAGE_REGISTRY/$component_name\") 
               | .spec.params[] |= (select(.name == \"image-tag\") .value = \"$COMMIT_SHA_SHORT\") 
               | .spec.workspaces[] |= (select(.name == \"basic-auth\") .secret.secretName = \"$GIT_AUTH_SECRET_NAME\") \
-              | .spec.params[] |= (select(.name == \"component-name\") .value = \"$component_name\") \
+              | .spec.params[] |= (select(.name == \"component-name\") .value = \"$component_name\")" \
             "$(params.template-filepath)" | kubectl apply -f -
 
             if [ $? -eq 0 ]; then
