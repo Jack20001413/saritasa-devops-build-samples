@@ -4,22 +4,29 @@ metadata:
   creationTimestamp: null
   name: tekton-trigger-pipelines
 rules:
-- apiGroups:
-  - tekton.dev
-  resources:
-  - pipelineruns
-  - taskruns
-  - pipelines
-  - tasks
-  verbs:
-  - create
-  - delete
-  - deletecollection
-  - get
-  - list
-  - patch
-  - update
-  - watch
+  - apiGroups: ["tekton.dev"]
+    resources: ["pipelineruns", "taskruns", "pipelines", "tasks"]
+    verbs: ["create", "delete", "deletecollection", "get", "list", "patch", "update", "watch"]
+  
+  # Deployment management (for component deployment)
+  - apiGroups: ["apps"]
+    resources: ["deployments", "deployments/rollback"]
+    verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+  
+  # Service management
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+
+    # Namespace management
+  - apiGroups: [""]
+    resources: ["namespaces"]
+    verbs: ["create", "get", "list", "patch", "update"]
+
+  # Pod management
+  - apiGroups: [""]
+    resources: ["pods", "pods/log"]
+    verbs: ["get", "list", "watch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
