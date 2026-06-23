@@ -34,75 +34,76 @@ spec:
     - name: deploy
       image: alpine/k8s:latest
       script: |
-      #!/bin/bash
-      set -e
+        #!/bin/bash
+        set -eu
 
-      REPLICAS="$(params.replicas)"
-      IMAGE_URL="$(params.image-url)"
-      NAMESPACE="$(params.namespace)"
-      ROLLOUT_TIMEOUT="$(params.timeout)"
-      DEPLOYMENT_NAME="$(params.component-name)-deployment"
-      SERVICE_NAME="$(params.component-name)-service"
+        REPLICAS="$(params.replicas)"
+        IMAGE_URL="$(params.image-url)"
+        NAMESPACE="$(params.namespace)"
+        ROLLOUT_TIMEOUT="$(params.timeout)"
+        DEPLOYMENT_NAME="$(params.component-name)-deployment"
+        SERVICE_NAME="$(params.component-name)-service"
 
-      echo "--- Deploying Component to Kubernetes ---"
-      echo "Component: $COMPONENT_NAME"
-      echo "Image: $IMAGE_URL"
-      echo "Deployment: $DEPLOYMENT_NAME"
-      echo "Namespace: $NAMESPACE"
-      echo "Replicas: $REPLICAS"
-      echo ""
+        echo "--- Deploying Component to Kubernetes ---"
+        echo "Component: $COMPONENT_NAME"
+        echo "Image: $IMAGE_URL"
+        echo "Deployment: $DEPLOYMENT_NAME"
+        echo "Namespace: $NAMESPACE"
+        echo "Replicas: $REPLICAS"
+        echo ""
 
-      # Create namespace if it doesn't exist
-      kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f -
+        # Create namespace if it doesn't exist
+        kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f -
 
-      # Check if the deployment exists
-      if kubectl get deployment ""$DEPLOYMENT_NAME"" -n ""$NAMESPACE"" > /dev/null; then
-          echo "Deployment exists, patching with new image..."
-          
-          echo -n "patch" > $(results.action.path)
+        # Check if the deployment exists
+        if kubectl get deployment ""$DEPLOYMENT_NAME"" -n ""$NAMESPACE"" > /dev/null; then
+            echo "Deployment exists, patching with new image..."
+            
+            echo -n "patch" > $(results.action.path)
 
-          if kubectl set image deployment "$DEPLOYMENT_NAME" \
-              "${DEPLOYMENT_NAME}"="${IMAGE_URL}" \
-              -n "$NAMESPACE"; then
+            if kubectl set image deployment "$DEPLOYMENT_NAME" \
+                "${DEPLOYMENT_NAME}"="${IMAGE_URL}" \
+                -n "$NAMESPACE"; then
 
-              echo ""
+                echo ""
 
-              echo -e "\033[0;32mNew image applied succesfully.\033[0m"
-              echo -n "success" > $(results.status.path)
-          else
-              echo -e "\033[0;31mFailed to apply new image.\033[0m"
-              echo -n "failure" > $(results.status.path)
+                echo -e "\033[0;32mNew image applied succesfully.\033[0m"
+                echo -n "success" > $(results.status.path)
+            else
+                echo -e "\033[0;31mFailed to apply new image.\033[0m"
+                echo -n "failure" > $(results.status.path)
 
-              exit 1
-          fi
-      else
-          echo "Creating new deployment..."
-          kubectl create deployment "$DEPLOYMENT_NAME" -n "$NAMESPACE" --image $IMAGE_URL --replicas $REPLICAS --dry-run=client -o yaml | kubectl apply -f -
+                exit 1
+            fi
+        else
+            echo "Creating new deployment..."
+            kubectl create deployment "$DEPLOYMENT_NAME" -n "$NAMESPACE" --image $IMAGE_URL --replicas $REPLICAS --dry-run=client -o yaml | kubectl apply -f -
 
-          echo "Creating a service..."
-          kubectl expose deployment "$DEPLOYMENT_NAME" \
-            -n "$NAMESPACE" \
-            --port=80 \
-            --target-port=8080 \
-            --name "$SERVICE_NAME"
-
-          echo -n "create" > $(results.action.path)
-
-          echo ""
-          echo "Waiting for deployment to be ready..."
-          if kubectl rollout status deployment "$DEPLOYMENT_NAME" \
+            echo "Creating a service..."
+            kubectl expose deployment "$DEPLOYMENT_NAME" \
               -n "$NAMESPACE" \
-              --timeout "$ROLLOUT_TIMEOUT"; then
+              --port=80 \
+              --target-port=8080 \
+              --name "$SERVICE_NAME"
 
-            echo -e "\033[0;32mRollout completed successfully.\033[0m"
-          
-            # Write result
-            echo -n "success" > $(results.status.path)
-          else
-            echo -e "\033[0;31mRollout timeout\033[0m"
+            echo -n "create" > $(results.action.path)
 
-            # Write result
-            echo -n "failure" > $(results.status.path)
-            exit 1
-      fi
-      
+            echo ""
+            echo "Waiting for deployment to be ready..."
+            if kubectl rollout status deployment "$DEPLOYMENT_NAME" \
+                -n "$NAMESPACE" \
+                --timeout "$ROLLOUT_TIMEOUT"; then
+
+              echo -e "\033[0;32mRollout completed successfully.\033[0m"
+            
+              # Write result
+              echo -n "success" > $(results.status.path)
+            else
+              echo -e "\033[0;31mRollout timeout\033[0m"
+
+              # Write result
+              echo -n "failure" > $(results.status.path)
+              exit 1
+            fi
+        fi
+        
