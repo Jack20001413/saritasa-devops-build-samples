@@ -95,5 +95,5 @@ spec:
         - name: replicas
           value: $(params.replicas)
         - name: namespace
-          value: $(params.deployment-namespace)
+          value: $(params.component-name)
       
