@@ -24,6 +24,7 @@ spec:
     - name: push-result
       description: Whether image is pushed successfully or failed
 
+  # This volume is for Pod in Minikube can interact with local Docker registry
   volumes:
     - name: docker-socket
       hostPath:
@@ -61,6 +62,8 @@ spec:
       script: |
         #!/bin/sh
         set -eu
+
+        ls -la "$(workspaces.docker-config.path)"
 
         IMAGE_URL="$(params.image-url):$(params.image-tag)"
         DOCKER_CONFIG_PATH="$(workspaces.docker-config.path)"
