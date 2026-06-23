@@ -46,7 +46,7 @@ spec:
 
         echo "----Ready to build image at $(pwd)----"
 
-        pack build $(params.image-url) --tag $(params.image-tag) --path "$(pwd)" --builder paketobuildpacks/builder-jammy-full
+        pack build $(params.image-url) --tag $(params.image-tag) --path "$(pwd)" --builder paketobuildpacks/builder-jammy-full --verbose
         
         echo -n "$(params.image-url):$(params.image-tag)" > $(results.image-full-url.path)
 
