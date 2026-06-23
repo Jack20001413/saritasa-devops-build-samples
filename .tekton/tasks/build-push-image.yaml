@@ -55,9 +55,12 @@ spec:
       env:
         - name: DOCKER_HOST
           value: unix:///var/run/docker.sock
+      volumeMounts:
+        - name: docker-socket
+          mountPath: /var/run/docker.sock
       script: |
-        #!/bin/bash
-        set -e
+        #!/bin/sh
+        set -eu
 
         IMAGE_URL="$(params.image-url):$(params.image-tag)"
         DOCKER_CONFIG_PATH="$(workspaces.docker-config.path)"
