@@ -75,18 +75,18 @@ spec:
     #     - name: docker-credentials
     #       workspace: docker-credentials
 
-    # - name: deploy-application
-    #   taskRef:
-    #     name: deploy-to-kubernetes
-    #   runAfter:
-    #     - push-to-registry
-    #   params:
-    #     - name: image-url
-    #       value: $(tasks.push-to-registry.results.image-full-url)
-    #     - name: deployment-name
-    #       value: $(params.deployment-name)
-    #     - name: replicas
-    #       value: $(params.replicaCount)
-    #     - name: namespace
-    #       value: $(params.deployment-namespace)
+    - name: deploy-application
+      taskRef:
+        name: deploy-to-kubernetes
+      runAfter:
+        - build-and-push-component
+      params:
+        - name: image-url
+          value: $(tasks.build-and-push-component.results.image-full-url)
+        - name: deployment-name
+          value: $(params.deployment-name)
+        - name: replicas
+          value: $(params.replicaCount)
+        - name: namespace
+          value: $(params.deployment-namespace)
       

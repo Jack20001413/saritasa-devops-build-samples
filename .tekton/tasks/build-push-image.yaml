@@ -63,8 +63,6 @@ spec:
         #!/bin/sh
         set -eu
 
-        ls -la "$(workspaces.docker-config.path)"
-
         IMAGE_URL="$(params.image-url):$(params.image-tag)"
         DOCKER_CONFIG_PATH="$(workspaces.docker-config.path)"
 
@@ -75,10 +73,6 @@ spec:
           echo "Using Docker config from workspace"
           export DOCKER_CONFIG="$DOCKER_CONFIG_PATH"
         fi
-
-        echo ""
-        echo "Verifying DOCKER_CONFIG"
-        echo $DOCKER_CONFIG
 
         # Push image
         echo "Pushing image $IMAGE_URL"
