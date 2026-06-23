@@ -20,6 +20,9 @@ spec:
     - name: project-dir
       type: string
       description: Full path of the project's directory to be built
+    - name: component-name
+      type: string
+      description: Name of the component being built
 
   workspaces:
     - name: source
@@ -83,10 +86,10 @@ spec:
       params:
         - name: image-url
           value: $(tasks.build-and-push-component.results.image-full-url)
-        - name: deployment-name
-          value: $(params.deployment-name)
+        - name: component-name
+          value: $(params.component-name)
         - name: replicas
-          value: $(params.replicaCount)
+          value: $(params.replicas)
         - name: namespace
           value: $(params.deployment-namespace)
       

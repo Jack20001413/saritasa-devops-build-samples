@@ -23,6 +23,8 @@ spec:
       description: Full URL of the built image
     - name: push-result
       description: Whether image is pushed successfully or failed
+    - name: component-name
+      description: Name of the component with changes
 
   # This volume is for Pod in Minikube can interact with local Docker registry
   volumes:
@@ -45,7 +47,7 @@ spec:
         #!/bin/bash
         set -eu
 
-        echo "----Ready to build image at $(pwd)----"
+        echo "--- Ready to build image at $(pwd) ---"
 
         pack build $(params.image-url):$(params.image-tag) --tag $(params.image-url):latest --path "$(pwd)" --builder paketobuildpacks/builder-jammy-full --verbose
         
