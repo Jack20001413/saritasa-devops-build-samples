@@ -32,24 +32,24 @@ spec:
         type: Socket
 
   steps:
-    # - name: build-image
-    #   image: buildpacksio/pack:base
-    #   workingDir: $(workspaces.source.path)/$(params.component-dir)
-    #   env:
-    #     - name: DOCKER_HOST
-    #       value: unix:///var/run/docker.sock
-    #   volumeMounts:
-    #     - name: docker-socket
-    #       mountPath: /var/run/docker.sock
-    #   script: |
-    #     #!/bin/bash
-    #     set -eu
+    - name: build-image
+      image: buildpacksio/pack:base
+      workingDir: $(workspaces.source.path)/$(params.component-dir)
+      env:
+        - name: DOCKER_HOST
+          value: unix:///var/run/docker.sock
+      volumeMounts:
+        - name: docker-socket
+          mountPath: /var/run/docker.sock
+      script: |
+        #!/bin/bash
+        set -eu
 
-    #     echo "----Ready to build image at $(pwd)----"
+        echo "----Ready to build image at $(pwd)----"
 
-    #     pack build $(params.image-url):$(params.image-tag) --tag $(params.image-url):latest --path "$(pwd)" --builder paketobuildpacks/builder-jammy-full --verbose
+        pack build $(params.image-url):$(params.image-tag) --tag $(params.image-url):latest --path "$(pwd)" --builder paketobuildpacks/builder-jammy-full --verbose
         
-    #     echo -n "$(params.image-url):$(params.image-tag)" > $(results.image-full-url.path)
+        echo -n "$(params.image-url):$(params.image-tag)" > $(results.image-full-url.path)
 
     - name: push-image
       image: docker:latest
