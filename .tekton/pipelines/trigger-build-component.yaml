@@ -23,6 +23,10 @@ spec:
     - name: component-name
       type: string
       description: Name of the component being built
+    - name: replicas
+      type: string
+      description: Number of replicas for the deployment
+      default: "1"
 
   workspaces:
     - name: source
