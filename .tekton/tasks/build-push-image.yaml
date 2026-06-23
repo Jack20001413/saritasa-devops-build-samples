@@ -74,6 +74,9 @@ spec:
         if [ -d "$DOCKER_CONFIG_PATH" ] && [ -f "$DOCKER_CONFIG_PATH/.dockerconfigjson" ]; then
           echo "Using Docker config from workspace"
           export DOCKER_CONFIG="$DOCKER_CONFIG_PATH"
+
+          echo "Verifying Docker config"
+          docker context ls
         fi
 
         # Push image
