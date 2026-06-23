@@ -18,6 +18,8 @@ spec:
       value: "{{ revision }}"
     - name: git-auth-secret-name
       value: "{{ git_auth_secret }}"
+    - name: image-registry
+      value: jackdock777
       
   pipelineRef:
     name: main-pipeline
