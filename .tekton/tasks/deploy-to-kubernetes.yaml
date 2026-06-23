@@ -45,7 +45,7 @@ spec:
         SERVICE_NAME="$(params.component-name)-service"
 
         echo "--- Deploying Component to Kubernetes ---"
-        echo "Component: $COMPONENT_NAME"
+        echo "Component: $(params.component-name)"
         echo "Image: $IMAGE_URL"
         echo "Deployment: $DEPLOYMENT_NAME"
         echo "Namespace: $NAMESPACE"
