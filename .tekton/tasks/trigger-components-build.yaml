@@ -87,6 +87,7 @@ spec:
 
             component_name="${component//\//-}"
             component_name="${component_name//./}"
+            component_name="${component_name//_/-}"
 
             PIPELINE_RUN_NAME="${component_name}-$COMMIT_SHA_SHORT-run"
 
