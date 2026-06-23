@@ -71,13 +71,14 @@ spec:
         echo "--- Pushing $IMAGE_URL ---"
 
         # Check if Docker config is provided
-        if [ -d "$DOCKER_CONFIG_PATH" ] && [ -f "$DOCKER_CONFIG_PATH/.dockerconfigjson" ]; then
+        if [ -d "$DOCKER_CONFIG_PATH" ] && [ -f "$DOCKER_CONFIG_PATH/config.json" ]; then
           echo "Using Docker config from workspace"
           export DOCKER_CONFIG="$DOCKER_CONFIG_PATH"
-
-          echo "Verifying Docker config"
-          docker context ls
         fi
+
+        echo ""
+        echo "Verifying DOCKER_CONFIG"
+        echo $DOCKER_CONFIG
 
         # Push image
         echo "Pushing image $IMAGE_URL"
