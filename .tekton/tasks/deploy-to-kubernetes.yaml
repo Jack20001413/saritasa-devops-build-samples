@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: deploy-to-kubernetes
-  namespace: saritasa-devops-build-samples-pipelines
+  namespace: saritasa-devops-project
 spec:
   params:
     - name: component-name

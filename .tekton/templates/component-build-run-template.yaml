@@ -6,6 +6,7 @@ metadata:
   annotations:
     pipelinesascode.tekton.dev/max-keep-runs: "5"
     saritasa.tekton.dev/commit-sha: "{{ commit_sha }}"
+    tekton.dev/auto-cleanup-pvc: true
 spec:
   timeouts:
     pipeline: 1h

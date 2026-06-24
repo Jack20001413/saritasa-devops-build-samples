@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
   name: build-deploy-single-component
-  namespace: saritasa-devops-build-samples-pipelines
+  namespace: saritasa-devops-project
 spec:
   params:
     - name: repo-url
