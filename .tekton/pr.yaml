@@ -1,11 +1,10 @@
 apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:
-  name: saritasa-devops-build-samples
+  name: build-project-pr-run
   annotations:
-    pipelinesascode.tekton.dev/on-event: "[pull_request, push, incoming]"
+    pipelinesascode.tekton.dev/on-event: "[pull_request]"
     pipelinesascode.tekton.dev/on-target-branch: "[main]"
-    pipelinesascode.tekton.dev/task: "[git-clone]"
     pipelinesascode.tekton.dev/max-keep-runs: "5"
     pipelinesascode.tekton.dev/on-path-changed-ignore: "[go.mod, go.sum, LICENSE, NOTICE, README.md, .editorconfig]"
 spec:
@@ -22,7 +21,7 @@ spec:
       value: jackdock777
       
   pipelineRef:
-    name: main-pipeline
+    name: build-project
 
   workspaces:
     - name: source

@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
-  name: main-pipeline
+  name: build-project
   namespace: saritasa-devops-build-samples-pipelines
 spec:
   params:
@@ -77,7 +77,7 @@ spec:
         - name: max-concurrent-builds
           value: "3"
         - name: template-filepath
-          value: ".tekton/trigger-component-build-run-template.yaml"
+          value: ".tekton/templates/component-build-run-template.yaml"
         - name: pipeline-namespace
           value: "saritasa-devops-build-samples-pipelines"
         - name: image-registry
