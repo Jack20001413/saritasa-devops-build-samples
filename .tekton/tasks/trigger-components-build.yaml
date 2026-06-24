@@ -95,9 +95,30 @@ spec:
             echo "PipelineRun name: $PIPELINE_RUN_NAME"
             echo "Namespace: $NAMESPACE"
 
+            # Scarcity control to prevent run too many PipelineRun concurrently
+            RUNNING_BUILDS=$(kubectl get pipelineruns -n $NAMESPACE \
+              -l tekton.dev/pipeline=build-deploy-single-component \
+              -o json 2>/dev/null \
+              | jq '.items[] | select(.metadata.annotations["saritasa.tekton.dev/commit-sha"] == "$REVISION")'
+              | wc -l)
+
+            while [ "$RUNNING_BUILDS" -ge "$MAX_CONCURRENT" ]; do
+              echo "Max concurrent builds reached ($RUNNING_BUILDS >= $MAX_CONCURRENT). Waiting for available slots..."
+              sleep 10
+              RUNNING_BUILDS=$(kubectl get pipelineruns -n $NAMESPACE \
+                -l tekton.dev/pipeline=build-deploy-single-component \
+                -o json 2>/dev/null \
+                | jq '.items[] | select(.metadata.annotations["saritasa.tekton.dev/commit-sha"] == "$REVISION")'
+                | wc -l)
+              echo "Current running builds: $RUNNING_BUILDS / $MAX_CONCURRENT"
+            done
+
+            echo "Slot available. Creating PipelineRun..."
+
             # Replace values into the PipelineRun template
             yq ".metadata.name = \"$PIPELINE_RUN_NAME\" 
-              | .metadata.namespace = \"$NAMESPACE\" 
+              | .metadata.namespace = \"$NAMESPACE\"
+              | .metadata.annotations.\"saritasa.tekton.dev/commit-sha\" = \"$REVISION\"
               | .spec.params[] |= (select(.name == \"repo-url\") .value = \"$REPO_URL\") 
               | .spec.params[] |= (select(.name == \"revision\") .value = \"$REVISION\") 
               | .spec.params[] |= (select(.name == \"project-dir\") .value = \"$component\") 
@@ -114,21 +135,6 @@ spec:
             else
               echo "Failed to create PipelineRun"
             fi
-                    
-            # Scarcity control
-            RUNNING_BUILDS=$(kubectl get pipelineruns -n $NAMESPACE \
-            -l tekton.dev/pipeline=build-deploy-single-component \
-            --field-selector=status.conditions[0].status=True 2>/dev/null \
-            | tail -n +2 | wc -l)
-
-            while [ $RUNNING_BUILDS -ge $MAX_CONCURRENT ]; do
-              echo "Waiting for available slots: running $RUNNING_BUILDS, max $MAX_CONCURRENT"
-              sleep 10
-              RUNNING_BUILDS=$(kubectl get pipelineruns -n $NAMESPACE \
-                  -l tekton.dev/pipeline=build-deploy-component \
-                  --field-selector=status.conditions[0].status=True 2>/dev/null \
-                  | tail -n +2 | wc -l)
-            done
         done
 
         echo ""

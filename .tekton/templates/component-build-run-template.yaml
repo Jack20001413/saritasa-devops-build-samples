@@ -5,6 +5,7 @@ metadata:
   namespace: "{{ namespace }}"
   annotations:
     pipelinesascode.tekton.dev/max-keep-runs: "5"
+    saritasa.tekton.dev/commit-sha: "{{ commit_sha }}"
 spec:
   timeouts:
     pipeline: 1h
