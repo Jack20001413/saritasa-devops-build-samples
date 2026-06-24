@@ -117,7 +117,7 @@ spec:
                     
             # Scarcity control
             RUNNING_BUILDS=$(kubectl get pipelineruns -n $NAMESPACE \
-            -l tekton.dev/pipeline=build-deploy-component \
+            -l tekton.dev/pipeline=build-deploy-single-component \
             --field-selector=status.conditions[0].status=True 2>/dev/null \
             | tail -n +2 | wc -l)
 

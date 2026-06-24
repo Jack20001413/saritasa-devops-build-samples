@@ -81,8 +81,8 @@ spec:
         # Fallback: use candidate dir if no marker found
         [ -n "$RESOLVED" ] || RESOLVED="$CANDIDATE"
 
-        echo "--- Changed path   : $INPUT ---"
-        echo "--- Build root     : ${RESOLVED#"$ROOT"/} ---"
+        echo "--- Changed path: $INPUT ---"
+        echo "--- Build root: ${RESOLVED#"$ROOT"/} ---"
 
         cd "$RESOLVED"
         echo "--- Ready to build image at $(pwd) ---"
