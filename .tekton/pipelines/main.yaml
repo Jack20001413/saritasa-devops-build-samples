@@ -75,7 +75,7 @@ spec:
         - name: changed-components
           value: "$(tasks.detect-changed-components.results.changed-dirs)"
         - name: max-concurrent-builds
-          value: 5
+          value: "3"
         - name: template-filepath
           value: ".tekton/trigger-component-build-run-template.yaml"
         - name: pipeline-namespace
