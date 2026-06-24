@@ -63,6 +63,7 @@ spec:
         read -r -a COMPONENTS <<< "$COMPONENTS_RAW"
 
         COMMIT_SHA_SHORT="${REVISION:0:7}"
+        PARENT_NAMESPACE=$(kubectl get repository -A -o jsonpath='{.items[0].metadata.namespace}')
 
         # Check if no changed components detected, then returns early
         if [ -z "$COMPONENTS_RAW" ] || [ "$COMPONENTS_RAW" = "[]" ]; then
@@ -96,7 +97,7 @@ spec:
             echo "Namespace: $NAMESPACE"
 
             # Scarcity control to prevent run too many PipelineRun concurrently
-            RUNNING_BUILDS=$(kubectl get pipelineruns -n $NAMESPACE \
+            RUNNING_BUILDS=$(kubectl get pipelineruns -n $PARENT_NAMESPACE \
               -l tekton.dev/pipeline=build-deploy-single-component \
               -o json 2>/dev/null \
               | jq '.items[] | select(.metadata.annotations["saritasa.tekton.dev/commit-sha"] == "$REVISION")' \
@@ -105,7 +106,7 @@ spec:
             while [ "$RUNNING_BUILDS" -ge "$MAX_CONCURRENT" ]; do
               echo "Max concurrent builds reached ($RUNNING_BUILDS >= $MAX_CONCURRENT). Waiting for available slots..."
               sleep 10
-              RUNNING_BUILDS=$(kubectl get pipelineruns -n $NAMESPACE \
+              RUNNING_BUILDS=$(kubectl get pipelineruns -n $PARENT_NAMESPACE \
                 -l tekton.dev/pipeline=build-deploy-single-component \
                 -o json 2>/dev/null \
                 | jq '.items[] | select(.metadata.annotations["saritasa.tekton.dev/commit-sha"] == "$REVISION")' \
