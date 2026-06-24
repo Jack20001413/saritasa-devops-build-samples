@@ -36,7 +36,7 @@ spec:
   steps:
     - name: build-image
       image: buildpacksio/pack:base
-      workingDir: $(workspaces.source.path)/$(params.component-dir)
+      workingDir: $(workspaces.source.path)
       env:
         - name: DOCKER_HOST
           value: unix:///var/run/docker.sock
@@ -47,6 +47,44 @@ spec:
         #!/bin/bash
         set -eu
 
+        ROOT="$(workspaces.source.path)"
+        COMPONENT_DIR="$(params.component-dir)"
+        INPUT="${COMPONENT_DIR#./}"
+        INPUT="${INPUT%/}"
+        [ -n "$INPUT" ] || INPUT="."
+
+        CANDIDATE="$ROOT/$INPUT"
+
+        # Walk up to nearest existing directory in case path was deleted
+        while [ ! -e "$CANDIDATE" ] && [ "$CANDIDATE" != "$ROOT" ]; do
+          CANDIDATE="$(dirname "$CANDIDATE")"
+        done
+        [ -d "$CANDIDATE" ] || CANDIDATE="$(dirname "$CANDIDATE")"
+
+        # Walk up from the changed directory until a build marker is found
+        MARKERS="package.json go.mod pom.xml build.gradle build.gradle.kts requirements.txt Pipfile pyproject.toml composer.json Gemfile Rakefile Procfile"
+        RESOLVED=""
+        SCAN="$CANDIDATE"
+        while :; do
+          for M in $MARKERS; do
+            if [ -f "$SCAN/$M" ]; then
+              RESOLVED="$SCAN"
+              break 2
+            fi
+          done
+          [ "$SCAN" = "$ROOT" ] && break
+          PARENT="$(dirname "$SCAN")"
+          [ "$PARENT" = "$SCAN" ] && break
+          SCAN="$PARENT"
+        done
+
+        # Fallback: use candidate dir if no marker found
+        [ -n "$RESOLVED" ] || RESOLVED="$CANDIDATE"
+
+        echo "--- Changed path   : $INPUT ---"
+        echo "--- Build root     : ${RESOLVED#"$ROOT"/} ---"
+
+        cd "$RESOLVED"
         echo "--- Ready to build image at $(pwd) ---"
 
         pack build $(params.image-url):$(params.image-tag) --tag $(params.image-url):latest --path "$(pwd)" --builder paketobuildpacks/builder-jammy-full --verbose
