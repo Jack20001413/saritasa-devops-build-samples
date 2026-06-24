@@ -99,7 +99,7 @@ spec:
             RUNNING_BUILDS=$(kubectl get pipelineruns -n $NAMESPACE \
               -l tekton.dev/pipeline=build-deploy-single-component \
               -o json 2>/dev/null \
-              | jq '.items[] | select(.metadata.annotations["saritasa.tekton.dev/commit-sha"] == "$REVISION")'
+              | jq '.items[] | select(.metadata.annotations["saritasa.tekton.dev/commit-sha"] == "$REVISION")' \
               | wc -l)
 
             while [ "$RUNNING_BUILDS" -ge "$MAX_CONCURRENT" ]; do
@@ -108,7 +108,7 @@ spec:
               RUNNING_BUILDS=$(kubectl get pipelineruns -n $NAMESPACE \
                 -l tekton.dev/pipeline=build-deploy-single-component \
                 -o json 2>/dev/null \
-                | jq '.items[] | select(.metadata.annotations["saritasa.tekton.dev/commit-sha"] == "$REVISION")'
+                | jq '.items[] | select(.metadata.annotations["saritasa.tekton.dev/commit-sha"] == "$REVISION")' \
                 | wc -l)
               echo "Current running builds: $RUNNING_BUILDS / $MAX_CONCURRENT"
             done
