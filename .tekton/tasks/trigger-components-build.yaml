@@ -81,7 +81,7 @@ spec:
         for component in "${COMPONENTS[@]}"; do
             component=$(echo "$component" | xargs)
 
-            if [ -z "$component" ]; then
+            if [ -z "$component" ] || [ "$component" = "." ]; then
               continue
             fi
 
