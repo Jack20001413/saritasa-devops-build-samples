@@ -96,12 +96,16 @@ spec:
             echo "PipelineRun name: $PIPELINE_RUN_NAME"
             echo "Namespace: $NAMESPACE"
 
+            echo "Max concurrent builds: $MAX_CONCURRENT"
+
             # Scarcity control to prevent run too many PipelineRun concurrently
             RUNNING_BUILDS=$(kubectl get pipelineruns -n $PARENT_NAMESPACE \
               -l tekton.dev/pipeline=build-deploy-single-component \
               -o json 2>/dev/null \
               | jq '.items[] | select(.metadata.annotations["saritasa.tekton.dev/commit-sha"] == "$REVISION")' \
               | wc -l)
+
+            echo "Current running builds: $RUNNING_BUILDS"
 
             while [ "$RUNNING_BUILDS" -ge "$MAX_CONCURRENT" ]; do
               echo "Max concurrent builds reached ($RUNNING_BUILDS >= $MAX_CONCURRENT). Waiting for available slots..."
