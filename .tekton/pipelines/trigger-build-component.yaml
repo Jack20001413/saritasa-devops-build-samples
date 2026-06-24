@@ -70,18 +70,6 @@ spec:
         - name: docker-config
           workspace: docker-config
 
-    # - name: push-to-registry
-    #   taskRef:
-    #     name: docker-push-image
-    #   runAfter:
-    #     - build-component
-    #   params:
-    #     - name: image-url
-    #       value: $(tasks.pack-build-component.results.image-full-url)
-    #   workspaces:
-    #     - name: docker-credentials
-    #       workspace: docker-credentials
-
     - name: deploy-application
       taskRef:
         name: deploy-to-kubernetes
