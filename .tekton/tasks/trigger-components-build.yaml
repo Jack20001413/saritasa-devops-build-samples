@@ -133,6 +133,8 @@ spec:
               | .spec.params[] |= (select(.name == \"component-name\") .value = \"$component_name\")" \
             "$(params.template-filepath)" | kubectl apply -f -
 
+            sleep 5
+
             if [ $? -eq 0 ]; then
               echo "PipelineRun created successfully"
               CREATED_RUNS="${CREATED_RUNS}${CREATED_RUNS:+,}${PIPELINE_RUN_NAME}"
