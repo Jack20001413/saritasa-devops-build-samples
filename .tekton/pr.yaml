@@ -7,7 +7,7 @@ metadata:
     pipelinesascode.tekton.dev/on-target-branch: "[main]"
     pipelinesascode.tekton.dev/max-keep-runs: "5"
     pipelinesascode.tekton.dev/on-path-changed-ignore: "[go.mod, go.sum, LICENSE, NOTICE, README.md, .editorconfig]"
-    tekton.dev/auto-cleanup-pvc: true
+    tekton.dev/auto-cleanup-pvc: "true"
 spec:
   params:
     # The variable with brackets are special to Pipelines-as-Code
