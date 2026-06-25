@@ -60,8 +60,8 @@ kubectl apply --filename https://infra.tekton.dev/tekton-releases/dashboard/late
 To access dashboard, create an Ingress resource.
 
 ```sh
-DASHBOARD_URL=dashboard.saritasa.test.com
-DASHBOARD_PATH=/
+DASHBOARD_URL="dashboard.saritasa.test.com"
+DASHBOARD_PATH="/"
 kubectl apply -n tekton-pipelines -f - <<EOF
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -72,8 +72,9 @@ spec:
   rules:
   - host: $DASHBOARD_URL
     http:
-      paths:
-      - pathType: $DASHBOARD_PATH
+      paths: 
+      - pathType: Prefix
+        path: $DASHBOARD_PATH
         backend:
           service:
             name: tekton-dashboard
@@ -99,9 +100,9 @@ minikube addons enable ingress
 Run below command to create an ingress
 
 ```sh
-DASHBOARD_URL=hook.saritasa.test.com
-DASHBOARD_PATH=/
-kubectl apply -n tekton-pipelines -f - <<EOF
+WEBHOOK_URL=hook.saritasa.test.com
+WEBHOOK_PATH=/
+kubectl apply -f - <<EOF
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -109,10 +110,11 @@ metadata:
   namespace: pipelines-as-code
 spec:
   rules:
-  - host: $DASHBOARD_URL
+  - host: $WEBHOOK_URL
     http:
       paths:
-      - pathType: $DASHBOARD_PATH
+      - pathType: Prefix
+        path: $WEBHOOK_PATH
         backend:
           service:
             name: pipelines-as-code-controller
@@ -140,7 +142,32 @@ Initialize a Github App for the Tekton's Pipeline as a recommended way in the of
 ```sh
 tkn pac bootstrap
 
+# You will be asked
+=> Checking if Pipelines-as-Code is installed.
+🕵️ Pipelines as Code doesn't seems to be installed in pipelines-as-code namespace
+? Do you want me to install Pipelines as Code v0.48.0? Yes
+✓ Pipelines-as-Code v0.48.0 has been installed
+👀 We have detected a tekton dashboard install on http://dashboard.saritasa.test.com
+? Do you want me to use it? Yes
+? Enter the name of your GitHub application:  <Name of your GitHub App>
+? Enter your public route URL:  <Public Webhook Endpoint>
 ```
+
+***Note***: Run this command from the root of this repository.
+
+### Add GitHub App's permissions to this repository
+
+After finishing bootstraping this repo, you need to follow the **Github** link returned by `tkn pac` command to add permission to this repo for the GitHub App you just created.
+
+Steps to perform:
+
+- Go to the GitHub App URL provided by `tkn pac bootstrap`
+- Click on the “Install” button.
+- Choose the repository you just created under your username.
+
+*Refer to this [link](https://pipelinesascode.com/docs/getting-started/#install-the-github-application-on-your-repository) for more info.*
+
+***Note***: For security reasons, you should scope down repository access to this repo only.
 
 ### Create a Repository CR
 
@@ -159,7 +186,25 @@ tkn pac create repository
 Use this command to create a K8S secret to hold content of the Docker's `config.json` file. This secret is then used for a task to push image to Docker registry.
 
 ```sh
-kubectl create secret generic docker-config --from-file=.dockerconfigjson="$HOME/.docker/config.json" --type=kubernetes.io/dockerconfigjson -n $(k get repository -A -o jsonpath='{.items[0].metadata.namespace}')
+kubectl create secret generic docker-config --from-file=config.json="$HOME/.docker/config.json" -n $(k get repository -A -o jsonpath='{.items[0].metadata.namespace}')
 ```
 
 ***Note***: Considering there's only 1 namespace containing all Respository CRs
+
+### Add concurrency limit to Repository CR
+
+Set concurrency limit to prevent Tekton from triggering all PiplineRuns, which might abuse all of cluster resources.
+
+```sh
+k patch repositories.pipelinesascode.tekton.dev <repository-name> -p '{"spec":{"concurrency_limit":2}}' --type 'merge' -n $(k get repository -A -o jsonpath='{.items[0].metadata.namespace}')
+```
+
+### Add permissions to pipeline's Service Account
+
+Since the pipeline are built to trigger other pipelines, it needs permissions to interact with different kinds of K8S resources in the cluster. There is a YAML file for setting permissions to pipeline's service account at `.tekton/rbac.yaml`.
+
+Run this command apply it.
+
+```sh
+kubectl apply -f .tekton/rbac.yaml
+```
