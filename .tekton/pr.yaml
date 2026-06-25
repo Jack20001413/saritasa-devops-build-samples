@@ -25,14 +25,18 @@ spec:
     name: build-project
 
   workspaces:
+    # - name: source
+    #   volumeClaimTemplate:
+    #     spec:
+    #       accessModes:
+    #         - ReadWriteOnce
+    #       resources:
+    #         requests:
+    #           storage: 1Gi
     - name: source
-      volumeClaimTemplate:
-        spec:
-          accessModes:
-            - ReadWriteOnce
-          resources:
-            requests:
-              storage: 1Gi
+      persistentVolumeClaim:
+        claimName: repository-source-pvc
+
     # This workspace will inject secret to help the git-clone task to be able to
     # checkout the private repositories
     - name: basic-auth

@@ -29,14 +29,17 @@ spec:
     name: build-deploy-single-component
 
   workspaces:
+    # - name: source
+    #   volumeClaimTemplate:
+    #     spec:
+    #       accessModes:
+    #         - ReadWriteOnce
+    #       resources:
+    #         requests:
+    #           storage: 1Gi
     - name: source
-      volumeClaimTemplate:
-        spec:
-          accessModes:
-            - ReadWriteOnce
-          resources:
-            requests:
-              storage: 1Gi
+      persistentVolumeClaim:
+        claimName: repository-source-pvc
 
     - name: basic-auth
       secret:

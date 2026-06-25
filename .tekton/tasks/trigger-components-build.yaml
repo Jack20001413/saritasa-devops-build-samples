@@ -133,6 +133,8 @@ spec:
               | .spec.params[] |= (select(.name == \"component-name\") .value = \"$component_name\")" \
             "$(params.template-filepath)" | kubectl apply -f -
 
+            # This `sleep` is to wait for PipelineRun resources to be created. Otherwise the 
+            # `$RUNNING_BUILDS` count might not pick up newly created Runs and tends to be inaccurate.
             sleep 5
 
             if [ $? -eq 0 ]; then
