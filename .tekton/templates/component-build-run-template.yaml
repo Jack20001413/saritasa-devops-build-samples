@@ -9,7 +9,7 @@ metadata:
     tekton.dev/auto-cleanup-pvc: "true"
 spec:
   timeouts:
-    pipeline: 1h
+    pipeline: 15m
 
   params:
     - name: repo-url
@@ -29,14 +29,6 @@ spec:
     name: build-deploy-single-component
 
   workspaces:
-    # - name: source
-    #   volumeClaimTemplate:
-    #     spec:
-    #       accessModes:
-    #         - ReadWriteOnce
-    #       resources:
-    #         requests:
-    #           storage: 1Gi
     - name: source
       persistentVolumeClaim:
         claimName: repository-source-pvc

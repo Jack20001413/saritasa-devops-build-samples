@@ -30,7 +30,7 @@ spec:
 
   workspaces:
     - name: source
-      description: Workspace for the repository
+      description: Workspace containing this repository's source code
     - name: basic-auth
       description: Git credentials
       optional: true
@@ -38,25 +38,9 @@ spec:
       description: Docker's config.json for pushing image
 
   tasks:
-    # - name: clone-repository
-    #   taskRef:
-    #     name: git-clone
-    #   params:
-    #     - name: url
-    #       value: $(params.repo-url)
-    #     - name: revision
-    #       value: $(params.revision)
-    #   workspaces:
-    #     - name: output
-    #       workspace: source
-    #     - name: basic-auth
-    #       workspace: basic-auth
-    
     - name: build-and-push-component
       taskRef:
         name: build-push-image
-      # runAfter:
-      #   - clone-repository
       params:
         - name: image-url
           value: $(params.image-url)

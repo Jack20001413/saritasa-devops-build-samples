@@ -3,12 +3,15 @@ kind: PipelineRun
 metadata:
   name: build-project-pr-run
   annotations:
-    pipelinesascode.tekton.dev/on-event: "[pull_request, push]"
+    pipelinesascode.tekton.dev/on-event: "[pull_request]"
     pipelinesascode.tekton.dev/on-target-branch: "[main]"
     pipelinesascode.tekton.dev/max-keep-runs: "5"
-    pipelinesascode.tekton.dev/on-path-changed-ignore: "[go.mod, go.sum, LICENSE, NOTICE, README.md, .editorconfig]"
+    pipelinesascode.tekton.dev/on-path-changed-ignore: "[go.mod, go.sum, LICENSE, NOTICE, README.md, .editorconfig, .tekton/**]"
     tekton.dev/auto-cleanup-pvc: "true"
 spec:
+  timeout:
+    pipeline: 1h
+
   params:
     # The variable with brackets are special to Pipelines-as-Code
     # They will automatically be expanded with the events from GitHub.
@@ -25,14 +28,6 @@ spec:
     name: build-project
 
   workspaces:
-    # - name: source
-    #   volumeClaimTemplate:
-    #     spec:
-    #       accessModes:
-    #         - ReadWriteOnce
-    #       resources:
-    #         requests:
-    #           storage: 1Gi
     - name: source
       persistentVolumeClaim:
         claimName: repository-source-pvc

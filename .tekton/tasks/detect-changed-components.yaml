@@ -4,6 +4,8 @@ metadata:
   name: detect-changed-components
   namespace: saritasa-devops-project
 spec:
+  description: A task to detect which components in this repository have changes
+
   workspaces:
     - name: source
   

@@ -4,6 +4,8 @@ metadata:
   name: deploy-to-kubernetes
   namespace: saritasa-devops-project
 spec:
+  description: A task to deploy component's built image to Kubernetes cluster
+
   params:
     - name: component-name
       type: string

@@ -4,6 +4,8 @@ metadata:
   name: trigger-components-build
   namespace: saritasa-devops-project
 spec:
+  description: A task to trigger builds for changed components
+
   params:
     - name: repo-url
       description: Git repo URL

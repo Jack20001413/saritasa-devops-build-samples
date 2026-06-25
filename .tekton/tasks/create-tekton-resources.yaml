@@ -4,6 +4,8 @@ metadata:
   name: create-tekton-resources
   namespace: saritasa-devops-project
 spec:
+  description: A task to create Tekton resources to support running pipelines to build and deploy components.
+
   workspaces:
     - name: source
   
