@@ -1,5 +1,35 @@
 # Tekton Documentation
 
+## Environment
+
+- K8S environment: Minikube
+- K8S version: v1.33.0
+- Linux environment: WSL2
+- Linux Distro: Ubuntu 24.04
+
+## Alternative
+
+I have prepared another way to set up Tekton and Pipeline-as-Code for this project using `Taskfile`. It's a fast, cross-platform build tool inspired by Make. It supports you to run all these setups in an automated way.
+
+I put a `Taskfile.yaml` at the root of this repository. This file defines all the tasks needed to run to set up this repository. Please read the file to get the gist of it.
+
+To be able to run `Taskfile`, you need to install its client following this [guide](https://taskfile.dev/docs/installation).
+
+```sh
+brew install go-task/tap/go-task
+```
+
+To first get used to `Taskfile`, you may run these commands:
+
+```sh
+task --help
+
+# List out all tasks for current project
+task default
+```
+
+Refer to Taskfile's [documentation](https://taskfile.dev/docs/getting-started) for further information.
+
 ## Prerequisites
 
 Before you begin, make sure you have the following in place:
@@ -22,6 +52,7 @@ Install **Tekton CLI**
 TKN_CLI_VERSION=0.43.2
 curl -LO "https://github.com/tektoncd/cli/releases/download/v${TKN_CLI_VERSION}/tektoncd-cli-${TKN_CLI_VERSION}_Linux-64bit.deb"
 sudo dpkg -i "./tektoncd-cli-${TKN_CLI_VERSION}_Linux-64bit.deb"
+sudo rm "./tektoncd-cli-${TKN_CLI_VERSION}_Linux-64bit.deb"
 
 # For verifying
 tkn version
@@ -33,6 +64,10 @@ Install **Tekton Pipeline-as-code** `tkn-pac`
 TKN_PAC_VERSION=0.39.7
 curl -LO "https://github.com/tektoncd/pipelines-as-code/releases/download/v${TKN_PAC_VERSION}/tkn-pac-${TKN_PAC_VERSION}_linux-x86_64.deb"
 sudo dpkg -i "./tkn-pac-${TKN_PAC_VERSION}_linux-x86_64.deb"
+sudo rm "./tkn-pac-${TKN_PAC_VERSION}_linux-x86_64.deb"
+
+# For verifying
+tkn pac version
 ```
 
 Install **Gosmee**. This is a webhook relay server to relay Github Webhook to your internal Tekton Pipelines
@@ -41,6 +76,10 @@ Install **Gosmee**. This is a webhook relay server to relay Github Webhook to yo
 GOSMEE_VERSION=0.31.1
 curl -LO "https://github.com/chmouel/gosmee/releases/download/v${GOSMEE_VERSION}/gosmee-${GOSMEE_VERSION}_linux-x86_64.deb"
 sudo dpkg -i "./gosmee-${GOSMEE_VERSION}_linux-x86_64.deb"
+sudo rm "./gosmee-${GOSMEE_VERSION}_linux-x86_64.deb"
+
+# For verifying
+gosmee --version
 ```
 
 ### Optional Dependencies
@@ -125,7 +164,7 @@ EOF
 
 ### Setup Gosmee as Webhook Relay
 
-Now, you need to set up a webhook relay server because you are hosting your CI system in a local K8s cluster. Go to this endpoint [https://hook.pipelinesascode.com/](https://hook.pipelinesascode.com/) to create a public endpoint so your Github Webhook can send its events to. This endpoint will create a unique endpoint once you accessing it.
+Now, you need to set up a webhook relay server because you are hosting your CI system in a local K8s cluster. Go to this endpoint [https://hook.pipelinesascode.com/](https://hook.pipelinesascode.com/) to create a public endpoint so your Github Webhook can send its events to. This endpoint will create a unique endpoint.
 
 Then, you configure `gosmee` client to relay events from [https://hook.pipelinesascode.com/](https://hook.pipelinesascode.com/) to your local CI system
 
@@ -134,6 +173,16 @@ gosmee client https://hook.pipelinesascode.com/<unique-id> http://hook.saritasa.
 ```
 
 ***Note***: After setting relay server, you need to open new terminal to continue running the setup because `gosmee` keeps running in the foreground in the current terminal.
+
+### Expose Minikube
+
+To enable traffics routed to Minikube, you need to create a tunnel to expose those ingresses for public traffics to route.
+
+```sh
+minikube tunnel
+```
+
+***Note***: After running command above, you need to open new terminal to continue running the setup because `minikube tunnel` keeps running in the foreground in the current terminal.
 
 ### Initialize a Github App
 
@@ -157,7 +206,7 @@ tkn pac bootstrap
 
 ### Add GitHub App's permissions to this repository
 
-After finishing bootstraping this repo, you need to follow the **Github** link returned by `tkn pac` command to add permission to this repo for the GitHub App you just created.
+After bootstraping this repo, you need to follow the **Github** link returned by `tkn pac` command to add permissions to this repo for the GitHub App you just created.
 
 Steps to perform:
 
@@ -189,14 +238,12 @@ Use this command to create a K8S secret to hold content of the Docker's `config.
 kubectl create secret generic docker-config --from-file=config.json="$HOME/.docker/config.json" -n $(k get repository -A -o jsonpath='{.items[0].metadata.namespace}')
 ```
 
-***Note***: Considering there's only 1 namespace containing all Respository CRs
-
 ### Add concurrency limit to Repository CR
 
 Set concurrency limit to prevent Tekton from triggering all PiplineRuns, which might abuse all of cluster resources.
 
 ```sh
-k patch repositories.pipelinesascode.tekton.dev <repository-name> -p '{"spec":{"concurrency_limit":2}}' --type 'merge' -n $(k get repository -A -o jsonpath='{.items[0].metadata.namespace}')
+k patch repositories.pipelinesascode.tekton.dev $(k get repository -A -o jsonpath='{.items[0].metadata.name}') -p '{"spec":{"concurrency_limit":2}}' --type 'merge' -n $(k get repository -A -o jsonpath='{.items[0].metadata.namespace}')
 ```
 
 ### Add permissions to pipeline's Service Account

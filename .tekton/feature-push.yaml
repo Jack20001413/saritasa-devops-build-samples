@@ -6,7 +6,7 @@ metadata:
     pipelinesascode.tekton.dev/on-event: "[push]"
     pipelinesascode.tekton.dev/on-target-branch: "[features/**]"
     pipelinesascode.tekton.dev/max-keep-runs: "5"
-    pipelinesascode.tekton.dev/on-path-changed-ignore: "[go.mod, go.sum, LICENSE, NOTICE, README.md, .editorconfig, .tekton/**]"
+    pipelinesascode.tekton.dev/on-path-changed-ignore: "[go.mod, go.sum, LICENSE, NOTICE, README.md, .editorconfig, .tekton/**, Taskfile.yaml]"
     tekton.dev/auto-cleanup-pvc: "true"
 spec:
   timeout:
@@ -21,6 +21,7 @@ spec:
       value: "{{ revision }}"
     - name: git-auth-secret-name
       value: "{{ git_auth_secret }}"
+    # This value needs updating to match your image registry
     - name: image-registry
       value: jackdock777
       
